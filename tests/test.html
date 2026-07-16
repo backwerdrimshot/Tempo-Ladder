@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tempo Ladder — core tests</title>
+<style>
+  body{font-family:"Segoe UI",system-ui,sans-serif;background:#f8e9d8;color:#142a36;margin:0;padding:24px}
+  h1{font-size:1.2rem}
+  #summary{font-size:1.05rem;font-weight:700;margin:12px 0;padding:10px 14px;border-radius:8px;border:2px solid #142a36;background:#fffdf8}
+  #summary.fail{border-color:#c94b20;color:#c94b20}
+  #summary.pass{border-color:#1d6b3c;color:#1d6b3c}
+  ul{list-style:none;padding:0;max-width:880px}
+  li{padding:7px 12px;border-radius:6px;margin-bottom:4px;background:#fffdf8;border:1px solid #d8d0c3;font-size:.92rem}
+  li.pass::before{content:"\2714  ";color:#1d6b3c;font-weight:700}
+  li.fail{border-color:#c94b20;background:#fdeee7}
+  li.fail::before{content:"\2718  ";color:#c94b20;font-weight:700}
+  li.fail pre{white-space:pre-wrap;margin:6px 0 0;font-size:.8rem;color:#8a2a10}
+</style>
+</head>
+<body>
+<h1>Tempo Ladder — sequence core tests</h1>
+<div id="summary">Running…</div>
+<ul id="results"></ul>
+<script src="../js/tempoladder-core.js"></script>
+<script src="cases.js"></script>
+<script>
+"use strict";
+// Minimal assert shim matching the subset the cases use.
+function fail(msg, detail) { throw new Error((msg || "assertion failed") + (detail ? "\n" + detail : "")); }
+const assert = {
+  ok(v, msg) { if (!v) fail(msg, "expected truthy, got " + JSON.stringify(v)); },
+  equal(a, b, msg) { if (a !== b) fail(msg, "expected " + JSON.stringify(b) + ", got " + JSON.stringify(a)); },
+  deepEqual(a, b, msg) {
+    const ja = JSON.stringify(a), jb = JSON.stringify(b);
+    if (ja !== jb) fail(msg, "expected " + jb + ",\n     got " + ja);
+  },
+};
+
+const cases = TempoLadderTests.getCases(TempoLadderCore);
+const list = document.getElementById("results");
+let passed = 0, failed = 0;
+for (const c of cases) {
+  const li = document.createElement("li");
+  li.textContent = c.name;
+  try {
+    c.fn(assert, TempoLadderCore);
+    li.className = "pass"; passed++;
+  } catch (e) {
+    li.className = "fail"; failed++;
+    const pre = document.createElement("pre");
+    pre.textContent = e.message;
+    li.appendChild(pre);
+  }
+  list.appendChild(li);
+}
+const s = document.getElementById("summary");
+s.className = failed ? "fail" : "pass";
+s.textContent = failed
+  ? failed + " of " + cases.length + " tests FAILED (" + passed + " passed)"
+  : "All " + cases.length + " tests passed";
+document.title = (failed ? "✘ " : "✔ ") + document.title;
+</script>
+</body>
+</html>

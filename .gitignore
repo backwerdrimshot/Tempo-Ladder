@@ -1,0 +1,4 @@
+# Local tool settings
+.claude/
+.vscode/
+serve.log

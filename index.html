@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="One exercise. One controlled climb. One controlled descent. A symmetric slow–fast–slow tempo trainer for percussionists." />
+<meta name="theme-color" content="#142a36" />
+<title>Tempo Ladder — Backwerd Rhythm Shop</title>
+<style>
+  /* Tempo Ladder — Grid Board visual language:
+     navy ink · warm cream paper · burnt-orange energy · sage selections. */
+  :root{
+    --paper:#f8e9d8;        /* warm cream page */
+    --paper-2:#fffdf8;      /* raised cream / panels */
+    --card:#fbf7ef;         /* panel paper */
+    --ink:#142a36;          /* deep navy ink */
+    --ink-soft:#58707b;     /* steel-blue muted text */
+    --ink-faint:#8ca1aa;
+    --orange:#f36f3d;       /* burnt orange */
+    --orange-deep:#c94b20;
+    --sage:#cfe1d4;         /* muted sage — selected states */
+    --sage-deep:#a9d8c0;
+    --stone:#d8d0c3;        /* soft stone borders */
+    --cyan:#58a6c3;
+    --good:#1d6b3c;
+    --serif:'Palatino Linotype',Palatino,'Iowan Old Style',Georgia,serif;
+    --radius:12px;
+    --shadow:5px 5px 0 rgba(20,42,54,.14);
+    font-synthesis:none;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:linear-gradient(180deg,#faf0e0,#f4e6d1);
+    color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    min-height:100vh;
+    padding:26px 16px 56px;
+  }
+  .wrap{max-width:1100px;margin:0 auto}
+
+  /* Brand header */
+  header.brand{
+    display:flex;align-items:center;gap:16px;margin-bottom:22px;
+    padding-bottom:16px;border-bottom:3px double var(--ink);
+  }
+  .logo{
+    width:56px;height:56px;border-radius:14px;flex:0 0 auto;
+    background:var(--orange);border:2px solid var(--ink);
+    display:grid;place-items:center;box-shadow:3px 3px 0 var(--ink);
+  }
+  .logo svg{width:34px;height:34px;display:block}
+  .brand h1{margin:0;font-size:1.7rem;letter-spacing:.2px;font-family:var(--serif)}
+  .brand h1 span{color:var(--orange)}
+  .brand p{margin:3px 0 0;color:var(--ink-soft);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;font-weight:700}
+  .brand .fs{margin-left:auto}
+
+  .panel{
+    background:var(--card);border:2px solid var(--ink);border-radius:var(--radius);
+    padding:20px;box-shadow:var(--shadow);
+  }
+  .panel + .panel{margin-top:18px}
+  .panel h2{
+    margin:0 0 16px;font-size:.72rem;text-transform:uppercase;letter-spacing:.18em;
+    color:var(--ink-soft);font-weight:800;
+    border-bottom:1px solid var(--stone);padding-bottom:9px;
+  }
+  .hint{color:var(--ink-soft);font-size:.85rem;margin:2px 0 0}
+
+  /* Setup grid */
+  .setup-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+  @media(max-width:720px){.setup-grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:460px){.setup-grid{grid-template-columns:1fr}}
+  .field label{display:block;font-weight:700;font-size:.9rem;margin-bottom:7px}
+  .num-row{display:flex;align-items:stretch;gap:8px}
+  .num-row input[type=number]{
+    flex:1;min-width:0;font-family:inherit;font-size:1.4rem;font-weight:800;
+    text-align:center;padding:8px 6px;border:2px solid var(--ink);border-radius:8px;
+    background:var(--paper-2);color:var(--ink);font-variant-numeric:tabular-nums;
+    -moz-appearance:textfield;
+  }
+  .num-row input[type=number]::-webkit-outer-spin-button,
+  .num-row input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  button.step{
+    width:44px;flex:0 0 auto;font-size:1.3rem;font-weight:800;cursor:pointer;
+    background:var(--paper-2);color:var(--ink);border:2px solid var(--ink);border-radius:8px;
+    box-shadow:2px 2px 0 var(--ink);transition:transform .06s ease,box-shadow .06s ease;
+  }
+  button.step:hover{background:var(--sage)}
+  button.step:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--ink)}
+
+  /* Segmented controls (measures + mode) */
+  .seg{display:flex;gap:0;border:2px solid var(--ink);border-radius:9px;overflow:hidden;box-shadow:2px 2px 0 var(--ink)}
+  .seg button{
+    flex:1;padding:11px 8px;font-family:inherit;font-size:.95rem;font-weight:800;cursor:pointer;
+    background:var(--paper-2);color:var(--ink);border:none;border-right:2px solid var(--ink);
+    transition:background .12s ease;
+  }
+  .seg button:last-child{border-right:none}
+  .seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper-2)}
+  .seg button:hover:not([aria-pressed="true"]){background:var(--sage)}
+
+  /* Ladder preview + Start */
+  .preview{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;margin-top:4px;font-variant-numeric:tabular-nums}
+  .preview .rung{font-weight:800;font-size:1.05rem}
+  .preview .arrow{color:var(--ink-faint)}
+  .preview .peak{color:var(--orange-deep)}
+  .meta{color:var(--ink-soft);font-size:.9rem;margin-top:10px}
+  .start-row{display:flex;gap:14px;align-items:center;margin-top:18px;flex-wrap:wrap}
+  .btn{
+    font-family:inherit;font-weight:800;cursor:pointer;border:2px solid var(--ink);border-radius:10px;
+    box-shadow:3px 3px 0 var(--ink);transition:transform .06s ease,box-shadow .06s ease,background .12s ease;
+  }
+  .btn:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
+  .btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:2px 2px 0 var(--ink)}
+  .btn.primary{background:var(--orange);color:var(--paper-2);font-size:1.05rem;padding:14px 30px;text-transform:uppercase;letter-spacing:.06em}
+  .btn.primary:hover:not(:disabled){background:var(--orange-deep)}
+  .btn.ghost{background:var(--paper-2);color:var(--ink);padding:12px 22px;font-size:.95rem}
+  .btn.ghost:hover:not(:disabled){background:var(--sage)}
+  .err{color:var(--orange-deep);font-weight:700;font-size:.9rem}
+
+  /* ---------------- Session screen ---------------- */
+  #screenSession[hidden],#screenSetup[hidden],#screenDone[hidden]{display:none}
+  .session-top{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center}
+  @media(max-width:640px){.session-top{grid-template-columns:1fr;text-align:center}}
+  .bpm-block{display:flex;flex-direction:column;gap:2px}
+  .bpm-huge{font-size:clamp(4rem,16vw,9rem);font-weight:800;line-height:.9;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+  .bpm-huge small{font-size:.22em;color:var(--ink-soft);font-weight:800;letter-spacing:.1em;vertical-align:.7em;margin-left:.15em}
+  .dir-word{font-family:var(--serif);font-style:italic;font-size:clamp(1.3rem,4vw,2.1rem);color:var(--ink-soft)}
+  .dir-word.peak{color:var(--orange-deep);font-style:normal;font-weight:800;text-transform:uppercase;letter-spacing:.04em;font-family:inherit}
+  .next-chip{
+    justify-self:end;text-align:center;border:2px solid var(--ink);border-radius:12px;
+    padding:12px 20px;background:var(--paper-2);box-shadow:var(--shadow);min-width:120px;
+  }
+  @media(max-width:640px){.next-chip{justify-self:center}}
+  .next-chip .lbl{font-size:.66rem;text-transform:uppercase;letter-spacing:.16em;color:var(--ink-soft);font-weight:800}
+  .next-chip .val{font-size:2.2rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+  .next-chip .val small{font-size:.9rem;color:var(--ink-soft)}
+
+  /* Beat dots */
+  .beats{display:flex;gap:12px;justify-content:center;margin:22px 0 6px}
+  .beat-dot{width:24px;height:24px;border-radius:50%;border:2px solid var(--ink);background:var(--paper-2);transition:background .05s linear,transform .05s linear}
+  .beat-dot.on{background:var(--cyan)}
+  .beat-dot.one{border-width:3px}
+  .beat-dot.one.on{background:var(--orange)}
+
+  /* Banner (Listen / warning / count-in) */
+  .banner{
+    margin:14px 0 4px;padding:13px 18px;border-radius:10px;border:2px solid var(--ink);
+    font-weight:800;text-align:center;font-size:1.05rem;min-height:1.2em;
+    background:var(--paper-2);color:var(--ink);box-shadow:2px 2px 0 var(--ink);
+  }
+  .banner.listen{background:var(--orange);color:var(--paper-2)}
+  .banner.warn{background:var(--sage-deep);color:var(--ink)}
+  .banner.countin{background:var(--sage);color:var(--ink)}
+  .banner.hidden{visibility:hidden}
+
+  .status-line{text-align:center;color:var(--ink-soft);font-size:1rem;margin:10px 0 4px;font-variant-numeric:tabular-nums}
+  .status-line strong{color:var(--ink)}
+
+  /* Ladder bars */
+  .ladder{display:flex;align-items:flex-end;gap:4px;height:150px;margin:20px 0 6px;padding:0 2px}
+  .ladder .bar-wrap{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:5px;height:100%;justify-content:flex-end}
+  .ladder .bar{
+    width:100%;border:2px solid var(--ink);border-radius:5px 5px 3px 3px;
+    background:var(--paper-2);transition:background .2s ease,transform .12s ease;
+  }
+  .ladder .bar.done{background:var(--sage-deep)}
+  .ladder .bar.current{background:var(--orange);transform:scaleY(1.02)}
+  .ladder .bar.peak-rung{border-color:var(--orange-deep)}
+  .ladder .bar-lbl{font-size:.62rem;font-weight:700;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+  .ladder .bar-wrap.current .bar-lbl{color:var(--orange-deep);font-weight:800}
+  @media(max-width:640px){.ladder{height:110px}.ladder .bar-lbl{display:none}}
+
+  .transport{display:flex;gap:14px;justify-content:center;margin-top:22px;flex-wrap:wrap}
+  .btn.big{font-size:1.05rem;padding:15px 34px;min-width:150px}
+  .btn.play{background:var(--ink);color:var(--paper-2)}
+  .btn.play:hover:not(:disabled){background:#0d1e28}
+
+  /* Completion */
+  .done-hero{text-align:center;padding:14px 0 6px}
+  .done-hero .mark{font-size:3.4rem}
+  .done-hero h2{border:none;font-size:1.8rem;color:var(--ink);text-transform:none;letter-spacing:0;font-family:var(--serif);margin:6px 0}
+  .done-summary{text-align:center;color:var(--ink-soft);font-size:1.05rem;margin:6px 0 4px;font-variant-numeric:tabular-nums}
+
+  footer.foot{margin-top:26px;text-align:center;color:var(--ink-faint);font-size:.76rem;line-height:1.5}
+  footer.foot a{color:var(--ink-soft)}
+
+  :focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+
+  /* Fullscreen presentation */
+  body:fullscreen,body:-webkit-full-screen{padding-top:20px}
+
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important}
+    .ladder .bar.current{transform:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="brand">
+    <span class="logo" aria-hidden="true">
+      <!-- climbing-then-descending bars -->
+      <svg viewBox="0 0 32 32" fill="none" stroke="#fffdf8" stroke-width="3" stroke-linecap="round">
+        <path d="M3 24 L11 14 L16 8 L21 14 L29 24" />
+        <path d="M3 28 L29 28" stroke-width="2.4" opacity=".7"/>
+      </svg>
+    </span>
+    <div>
+      <h1>Tempo <span>Ladder</span></h1>
+      <p>Backwerd Rhythm Shop</p>
+    </div>
+    <button class="btn ghost fs" id="btnFull" type="button" title="Full screen">⛶ Full screen</button>
+  </header>
+
+  <!-- ============ SETUP ============ -->
+  <section id="screenSetup">
+    <div class="panel">
+      <h2>Set the climb</h2>
+      <div class="setup-grid">
+        <div class="field">
+          <label for="startBpm">Starting BPM</label>
+          <div class="num-row">
+            <button class="step" type="button" data-target="startBpm" data-d="-1" aria-label="Lower starting BPM">–</button>
+            <input id="startBpm" type="number" min="30" max="300" step="1" value="60" inputmode="numeric" />
+            <button class="step" type="button" data-target="startBpm" data-d="1" aria-label="Raise starting BPM">+</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="peakBpm">Peak BPM</label>
+          <div class="num-row">
+            <button class="step" type="button" data-target="peakBpm" data-d="-1" aria-label="Lower peak BPM">–</button>
+            <input id="peakBpm" type="number" min="30" max="300" step="1" value="100" inputmode="numeric" />
+            <button class="step" type="button" data-target="peakBpm" data-d="1" aria-label="Raise peak BPM">+</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="stepBpm">BPM step</label>
+          <div class="num-row">
+            <button class="step" type="button" data-target="stepBpm" data-d="-1" aria-label="Lower BPM step">–</button>
+            <input id="stepBpm" type="number" min="1" max="30" step="1" value="5" inputmode="numeric" />
+            <button class="step" type="button" data-target="stepBpm" data-d="1" aria-label="Raise BPM step">+</button>
+          </div>
+        </div>
+        <div class="field">
+          <label id="measuresLbl">Measures per tempo</label>
+          <div class="seg" role="group" aria-labelledby="measuresLbl" id="segMeasures">
+            <button type="button" data-val="4">4</button>
+            <button type="button" data-val="8" aria-pressed="true">8</button>
+            <button type="button" data-val="16">16</button>
+          </div>
+        </div>
+        <div class="field">
+          <label id="modeLbl">Mode</label>
+          <div class="seg" role="group" aria-labelledby="modeLbl" id="segMode">
+            <button type="button" data-val="step" aria-pressed="true">Step</button>
+            <button type="button" data-val="nonstop">Nonstop</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>&nbsp;</label>
+          <p class="hint" id="modeHint">Step adds one click-only reset measure at the new tempo between rungs.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>The ladder</h2>
+      <div class="preview" id="preview" aria-live="polite"></div>
+      <p class="meta" id="previewMeta"></p>
+      <div class="start-row">
+        <button class="btn primary" id="btnStart" type="button">Start</button>
+        <span class="err" id="setupErr" role="alert"></span>
+      </div>
+      <p class="hint" style="margin-top:14px">4/4 · quarter-note click · accented beat one · one-measure count-in at the starting tempo. Bring your own rudiment, exercise, excerpt, or scale.</p>
+    </div>
+  </section>
+
+  <!-- ============ SESSION ============ -->
+  <section id="screenSession" hidden>
+    <div class="panel">
+      <div class="session-top">
+        <div class="bpm-block">
+          <div class="bpm-huge" id="curBpm" aria-live="off">60<small>BPM</small></div>
+          <div class="dir-word" id="dirWord">Climbing</div>
+        </div>
+        <div class="next-chip">
+          <div class="lbl">Next tempo</div>
+          <div class="val" id="nextBpm">65<small> BPM</small></div>
+        </div>
+      </div>
+
+      <div class="beats" id="beats" aria-hidden="true">
+        <span class="beat-dot one"></span><span class="beat-dot"></span><span class="beat-dot"></span><span class="beat-dot"></span>
+      </div>
+
+      <div class="banner hidden" id="banner" aria-live="assertive"></div>
+      <div class="status-line" id="statusLine" aria-live="polite"></div>
+
+      <div class="ladder" id="ladder" aria-hidden="true"></div>
+
+      <div class="transport">
+        <button class="btn big play" id="btnPause" type="button">Pause</button>
+        <button class="btn big ghost" id="btnReset" type="button">Reset</button>
+      </div>
+      <span class="err" id="sessionErr" role="alert"></span>
+    </div>
+  </section>
+
+  <!-- ============ COMPLETE ============ -->
+  <section id="screenDone" hidden>
+    <div class="panel">
+      <div class="done-hero">
+        <div class="mark" aria-hidden="true">▲</div>
+        <h2>Ladder complete</h2>
+      </div>
+      <p class="done-summary" id="doneSummary"></p>
+      <div class="transport">
+        <button class="btn big primary" id="btnReplay" type="button">Replay</button>
+        <button class="btn big ghost" id="btnNew" type="button">New settings</button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div>One exercise. One controlled climb. One controlled descent.</div>
+    <div>Tempo Ladder · Backwerd Rhythm Shop · © Backwerd Rimshot, LLC</div>
+  </footer>
+</div>
+
+<script src="js/tempoladder-core.js"></script>
+<script src="js/tempoladder-app.js"></script>
+</body>
+</html>

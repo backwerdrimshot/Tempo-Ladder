@@ -1,0 +1,115 @@
+# Tempo Ladder — by Backwerd Rhythm Shop
+
+**One exercise. One controlled climb. One controlled descent.**
+
+Tempo Ladder guides a percussionist through a single symmetric **slow → fast →
+slow** tempo sequence while the student plays a rudiment, exercise, excerpt,
+scale, or any other material *outside* the app. Tempo Ladder manages the tempo;
+you bring the music.
+
+Sibling app to [Pulse Pocket Metronome](https://pulse.backwerdrhythmshop.com/),
+[Click Drop](https://clickdrop.backwerdrhythmshop.com/), and
+[Grid Board](https://gridboard.backwerdrhythmshop.com/).
+
+## How to run
+
+It's a self-contained web app — no install, no build step, no internet needed.
+
+- **Double-click `index.html`** — it opens in your default browser and works
+  fully, audio included (Chrome, Edge, Firefox, Safari).
+- Or serve it locally (handy for phones on the same network):
+
+  ```powershell
+  powershell -ExecutionPolicy Bypass -File serve.ps1
+  ```
+
+  then open <http://localhost:8433/>.
+
+## What it does
+
+You set five things and press **Start**:
+
+| Control | Default | Notes |
+|---|---|---|
+| Starting BPM | 60 | The tempo at both ends of the ladder |
+| Peak BPM | 100 | Played exactly once, at the apex |
+| BPM step | 5 | Size of each rung |
+| Measures per tempo | 8 | 4, 8, or 16 |
+| Mode | Step | **Step** or **Nonstop** |
+
+Fixed for the MVP: **4/4**, quarter-note click, accented beat one, and a
+one-measure **count-in** at the starting tempo.
+
+### The ladder
+
+Tempo Ladder always builds one symmetric path — the start tempo bookends it, the
+peak is hit once, and the descent retraces the ascent:
+
+```
+60 → 65 → 70 → 75 → 80 → 75 → 70 → 65 → 60
+```
+
+If the step doesn't land exactly on the peak, the exact peak is still included
+and the return stays symmetric over the rungs actually visited:
+
+```
+buildLadder({ startBpm: 60, peakBpm: 72, stepBpm: 5 })  ->  [60, 65, 70, 72, 70, 65, 60]
+```
+
+### Step Mode
+
+Between played rungs, Step Mode inserts **exactly one click-only measure** — a
+short physical reset that also counts you into the new tempo. It clicks at the
+**upcoming** tempo, not the previous one:
+
+> Listen — next tempo: 65 BPM
+
+### Nonstop Mode
+
+You play straight through the whole ladder. There's no reset measure; the tempo
+changes on the next measure boundary, and the final measure before each change
+shows a warning:
+
+> Tempo change next measure → 65 BPM
+
+## Architecture
+
+Layered exactly like Click Drop, so the musical logic is testable without a
+browser or speakers:
+
+1. **Ladder construction** — `buildLadder()` (pure)
+2. **Playback-position machine** — `createLadderPlayback()` (pure)
+3. **Web Audio scheduler** — a lookahead scheduler on the `AudioContext`
+   timeline (the single source of truth for *when* beats happen)
+4. **Timestamped visual-event queue** — keeps the display synced to what's heard
+5. **DOM rendering**
+
+Layers 1–2 live in [`js/tempoladder-core.js`](js/tempoladder-core.js) with no DOM
+or audio. Layers 3–5 live in [`js/tempoladder-app.js`](js/tempoladder-app.js).
+Tempo changes are baked into the scheduled audio timeline — never an imprecise
+UI timer flipping a BPM variable after the fact.
+
+## Tests
+
+The pure ladder and playback logic are covered by runner-agnostic cases in
+[`tests/cases.js`](tests/cases.js):
+
+- **In a browser:** open [`tests/test.html`](tests/test.html) — no tooling needed.
+- **With Node:** `node --test tests/`
+
+They verify the required behavior: the `60,65,70,65,60` example, an off-grid
+peak included exactly once, the start tempo at both ends, one Step-Mode
+transition per rung at the *upcoming* tempo, no Nonstop transitions, tempo
+changes only at measure boundaries, pause/resume position integrity, reset,
+snapshot coherence, and no timing drift over a full ladder.
+
+## What Tempo Ladder is *not*
+
+No notation, exercise library, sticking, rhythm building, counting systems,
+disappearing clicks, custom subdivisions or accents, extra meters, grading,
+scores, badges, challenges, accounts, or practice history. It manages tempo
+progression; the student or teacher supplies the musical content.
+
+---
+
+© Backwerd Rimshot, LLC
