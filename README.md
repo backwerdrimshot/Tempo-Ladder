@@ -64,6 +64,10 @@ short physical reset that also counts you into the new tempo. It clicks at the
 
 > Listen — next tempo: 65 BPM
 
+Those click-only measures (and the opening count-in) use a softer, warmer click
+than the played measures, so you *hear* "count / reset — don't play yet" without
+having to watch the screen.
+
 ### Nonstop Mode
 
 You play straight through the whole ladder. There's no reset measure; the tempo
@@ -71,6 +75,19 @@ changes on the next measure boundary, and the final measure before each change
 shows a warning:
 
 > Tempo change next measure → 65 BPM
+
+### Small conveniences
+
+- **Remembered settings** — your last-used values come back next time (stored
+  locally in the browser; nothing leaves the device).
+- **Shareable link** — **Copy link** puts a URL on your clipboard that opens the
+  setup pre-filled with the current climb, e.g.
+  `…/index.html?start=60&peak=100&step=5&measures=8&mode=step`. Hand one to a
+  student and they get exactly the ladder you set. A shared link wins over
+  remembered settings.
+- **Stays awake** — while a session plays, the screen is kept from sleeping
+  (best-effort, where the browser supports it) so a phone on a music stand
+  doesn't dim mid-climb.
 
 ## Architecture
 

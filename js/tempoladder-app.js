@@ -27,16 +27,21 @@ function initAudio() {
   master.connect(audio.destination);
 }
 // Oscillator click voice. Quarter-note click, beat one accented.
+// Played measures use a bright square wave. The click-only "listen" measures
+// (count-in and Step-Mode transitions) use a softer, warmer sine so the student
+// HEARS "count / reset — don't play yet" without having to read the screen.
 function click(time, type) {
   var specs = {
-    down: { f: 1568, g: 1.0,  d: 0.06 },  // beat-one accent
-    beat: { f: 988,  g: 0.72, d: 0.05 },  // other quarters
+    down: { f: 1568, g: 1.0,  d: 0.06, w: "square" },  // played, beat-one accent
+    beat: { f: 988,  g: 0.72, d: 0.05, w: "square" },  // played, other quarters
+    "listen-down": { f: 1319, g: 0.60, d: 0.075, w: "sine" }, // count/reset, beat one
+    "listen-beat": { f: 880,  g: 0.42, d: 0.05,  w: "sine" }, // count/reset, other quarters
   };
   var s = specs[type];
   var osc = audio.createOscillator();
   var g = audio.createGain();
   osc.frequency.value = s.f;
-  osc.type = "square";
+  osc.type = s.w;
   g.gain.setValueAtTime(0.0001, time);
   g.gain.exponentialRampToValueAtTime(s.g, time + 0.001);
   g.gain.exponentialRampToValueAtTime(0.0001, time + s.d);
@@ -51,6 +56,23 @@ function killPending() {
   master = audio.createGain();
   master.gain.value = 0.9;
   master.connect(audio.destination);
+}
+
+/* ---------------- screen wake lock ----------------
+   A phone on a music stand dims and sleeps mid-climb. Hold a screen wake lock
+   while playing. Best-effort: unsupported browsers and rejected requests are
+   ignored, and the OS auto-releases the lock when the tab hides — we re-acquire
+   it on return (see the visibilitychange handler). */
+var wakeLock = null;
+function requestWakeLock() {
+  if (!("wakeLock" in navigator) || wakeLock) return;
+  navigator.wakeLock.request("screen").then(function (wl) {
+    wakeLock = wl;
+    wakeLock.addEventListener("release", function () { wakeLock = null; });
+  }).catch(function () { /* denied or not allowed in this context — no problem */ });
+}
+function releaseWakeLock() {
+  if (wakeLock) { wakeLock.release().catch(function () {}); wakeLock = null; }
 }
 
 /* ---------------- live playback state ---------------- */
@@ -83,7 +105,9 @@ function scheduler() {
     }
     var st = pb.currentStage();
     var isDown = live.pos.beat === 0;
-    click(live.nextTime, isDown ? "down" : "beat");
+    // Count-in and Step-Mode transitions are click-only "listen" measures.
+    var listen = st.kind === "count-in" || st.kind === "transition";
+    click(live.nextTime, (listen ? "listen-" : "") + (isDown ? "down" : "beat"));
 
     // Snapshot everything the display needs, stamped with the beat's hear-time.
     live.visualQ.push({
@@ -258,6 +282,7 @@ function startSession() {
   updatePauseBtn();
   live.timer = setInterval(scheduler, LOOKAHEAD);
   live.raf = requestAnimationFrame(visualLoop);
+  requestWakeLock();
   $("btnPause").focus();
 }
 
@@ -277,6 +302,7 @@ function pauseSession() {
   audio.suspend(); // context clock freezes — scheduled clicks stay valid, no doubles
   if (live.timer) { clearInterval(live.timer); live.timer = null; }
   if (live.raf) { cancelAnimationFrame(live.raf); live.raf = null; }
+  releaseWakeLock();
   live.status = "paused";
   updatePauseBtn();
   $("statusLine").innerHTML = "Paused — press Resume to pick up exactly where you left off.";
@@ -289,11 +315,13 @@ function resumeSession() {
   updatePauseBtn();
   live.timer = setInterval(scheduler, LOOKAHEAD);
   live.raf = requestAnimationFrame(visualLoop);
+  requestWakeLock();
 }
 
 function stopSession() {
   if (live.timer) { clearInterval(live.timer); live.timer = null; }
   if (live.raf) { cancelAnimationFrame(live.raf); live.raf = null; }
+  releaseWakeLock();
   live.visualQ = [];
   live.doneQueued = false;
   if (audio) { killPending(); if (audio.state === "suspended") audio.resume(); }
@@ -346,9 +374,11 @@ function clearErr() { $("setupErr").textContent = ""; $("sessionErr").textConten
 
 function syncPreview() {
   readSettings();
+  persistSettings();
   var wrap = $("preview");
   var ok = settings.peakBpm > settings.startBpm;
   $("btnStart").disabled = !ok;
+  $("btnShare").disabled = !ok;
   if (!ok) {
     wrap.innerHTML = '<span class="hint">Set a peak higher than the start to build the ladder.</span>';
     $("previewMeta").textContent = "";
@@ -400,13 +430,102 @@ document.querySelectorAll("button.step").forEach(function (b) {
   $(id).addEventListener("change", syncPreview);
 });
 wireSeg("segMeasures", "measuresPerTempo");
-wireSeg("segMode", "mode", function (v) {
-  $("modeHint").textContent = v === "step"
+wireSeg("segMode", "mode", updateModeHint);
+
+function updateModeHint() {
+  $("modeHint").textContent = settings.mode === "step"
     ? "Step adds one click-only reset measure at the new tempo between rungs."
     : "Nonstop plays through the whole ladder; the tempo shifts on the next downbeat.";
-});
+}
+
+/* ---------------- remembered settings + shareable link ----------------
+   Last-used settings persist to localStorage so a returning student isn't
+   re-entering them. A shareable link encodes the five settings in the URL so a
+   teacher can hand out one climb; opening it pre-fills the setup screen. */
+var STORE_KEY = "tempoladder-settings";
+
+function persistSettings() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(settings)); } catch (e) { /* private mode — skip */ }
+}
+function loadSaved() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)); } catch (e) { return null; }
+}
+
+// Clamp a value to an integer range; return null for missing/garbage so callers
+// leave the existing setting untouched.
+function toInt(v, lo, hi) {
+  if (v === null || v === undefined || v === "") return null;
+  var n = Math.round(+v);
+  if (!isFinite(n)) return null;
+  return Math.max(lo, Math.min(hi, n));
+}
+// Fold a raw {startBpm,...}-shaped object into settings, validating each field.
+function coerceSettings(raw) {
+  if (!raw || typeof raw !== "object") return;
+  var n;
+  if ((n = toInt(raw.startBpm, 30, 300)) !== null) settings.startBpm = n;
+  if ((n = toInt(raw.peakBpm,  30, 300)) !== null) settings.peakBpm = n;
+  if ((n = toInt(raw.stepBpm,   1,  30)) !== null) settings.stepBpm = n;
+  if ([4, 8, 16].indexOf(+raw.measuresPerTempo) !== -1) settings.measuresPerTempo = +raw.measuresPerTempo;
+  if (raw.mode === "step" || raw.mode === "nonstop") settings.mode = raw.mode;
+}
+// Read a shared link's query params into a raw settings-shaped object.
+function queryToRaw() {
+  var q = new URLSearchParams(location.search);
+  return {
+    startBpm: q.get("start"), peakBpm: q.get("peak"), stepBpm: q.get("step"),
+    measuresPerTempo: q.get("measures"), mode: q.get("mode"),
+  };
+}
+function shareUrl() {
+  return location.origin + location.pathname +
+    "?start=" + settings.startBpm + "&peak=" + settings.peakBpm + "&step=" + settings.stepBpm +
+    "&measures=" + settings.measuresPerTempo + "&mode=" + settings.mode;
+}
+
+// Reflect the resolved settings into the setup controls.
+function setSeg(segId, val) {
+  var kids = $(segId).querySelectorAll("button");
+  for (var i = 0; i < kids.length; i++)
+    kids[i].setAttribute("aria-pressed", kids[i].dataset.val === val ? "true" : "false");
+}
+function hydrateControls() {
+  $("startBpm").value = settings.startBpm;
+  $("peakBpm").value = settings.peakBpm;
+  $("stepBpm").value = settings.stepBpm;
+  setSeg("segMeasures", String(settings.measuresPerTempo));
+  setSeg("segMode", settings.mode);
+}
+
+// Copy the shareable link, with a clipboard-API path and an execCommand fallback
+// (file:// and older browsers), plus a brief "Copied" confirmation on the button.
+function copyShareLink() {
+  var url = shareUrl();
+  var ok = function () { flashShare("Copied ✓"); };
+  var fail = function () { if (fallbackCopy(url)) ok(); else flashShare("Copy failed"); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(ok).catch(fail);
+  else fail();
+}
+function fallbackCopy(text) {
+  try {
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    var done = document.execCommand("copy");
+    document.body.removeChild(ta);
+    return done;
+  } catch (e) { return false; }
+}
+var shareTimer = null;
+function flashShare(msg) {
+  var b = $("btnShare");
+  b.textContent = msg;
+  if (shareTimer) clearTimeout(shareTimer);
+  shareTimer = setTimeout(function () { b.textContent = "Copy link"; }, 1600);
+}
 
 $("btnStart").addEventListener("click", startSession);
+$("btnShare").addEventListener("click", copyShareLink);
 $("btnPause").addEventListener("click", function () { live.status === "paused" ? resumeSession() : pauseSession(); });
 $("btnReset").addEventListener("click", resetToSetup);
 $("btnReplay").addEventListener("click", startSession);
@@ -429,9 +548,18 @@ document.addEventListener("keydown", function (e) {
   }
 });
 
-// Returning to the tab: flush the queue so the display snaps to hear-time.
+// Returning to the tab: flush the queue so the display snaps to hear-time, and
+// re-acquire the wake lock the OS dropped while we were hidden.
 document.addEventListener("visibilitychange", function () {
-  if (!document.hidden && live.status === "playing") flushVisual();
+  if (!document.hidden && live.status === "playing") { flushVisual(); requestWakeLock(); }
 });
 
+/* ---------------- boot ----------------
+   Settings precedence: built-in defaults < last-used (localStorage) < a shared
+   link's query params. Reflect the resolved settings into the controls, then
+   render the preview. */
+coerceSettings(loadSaved());
+coerceSettings(queryToRaw());
+hydrateControls();
+updateModeHint();
 syncPreview();
