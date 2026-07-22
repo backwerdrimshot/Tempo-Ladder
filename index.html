@@ -340,5 +340,39 @@
 
 <script src="js/tempoladder-core.js"></script>
 <script src="js/tempoladder-app.js"></script>
+<script>
+/* Build stamp + self-documenting support/feedback emails. Progressive enhancement:
+   if this script fails, the plain mailto links still work. */
+(function () {
+  function two(n) { return String(n).padStart(2, "0"); }
+  var d = new Date(document.lastModified);
+  var build = (window.__BUILD__ && String(window.__BUILD__)) ||
+    (isNaN(d.getTime()) ? "" : d.getFullYear() + "-" + two(d.getMonth() + 1) + "-" + two(d.getDate()));
+
+  var footer = document.querySelector("footer");
+  if (footer && build && !footer.querySelector(".build-stamp")) {
+    var s = document.createElement("div");
+    s.className = "build-stamp";
+    s.style.cssText = "margin-top:8px;opacity:.55;font-size:11px";
+    s.textContent = "Build " + build;
+    footer.appendChild(s);
+  }
+
+  document.querySelectorAll('a[href^="mailto:"]').forEach(function (a) {
+    var href = a.getAttribute("href") || "";
+    if (!/support@|feedback@/.test(href) || /[?&]body=/.test(href)) return;
+    var m = href.match(/[?&]subject=([^&]*)/);
+    var subject = m ? decodeURIComponent(m[1].replace(/\+/g, " ")) : "";
+    var app = (subject.split(/\s[—-]\s/)[0] || document.title || "this app").trim();
+    var body = (/support@/.test(href)
+        ? "Describe what went wrong — what you did, what you expected, and what actually happened:"
+        : "Describe your idea or request:")
+      + "\n\n\n\n─── details below help with troubleshooting ───\n"
+      + "App: " + app + "\nBuild: " + (build || "unknown")
+      + "\nPage: " + location.href + "\nBrowser: " + navigator.userAgent;
+    a.setAttribute("href", href + "&body=" + encodeURIComponent(body));
+  });
+})();
+</script>
 </body>
 </html>
