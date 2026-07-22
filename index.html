@@ -185,6 +185,9 @@
 
   footer.foot{margin-top:26px;text-align:center;color:var(--ink-faint);font-size:.76rem;line-height:1.5}
   footer.foot a{color:var(--ink-soft)}
+  .foot-links{display:flex;justify-content:center;gap:8px;margin:14px 0 4px;flex-wrap:wrap}
+  footer.foot a.foot-btn{display:inline-flex;align-items:center;gap:6px;text-decoration:none;background:var(--paper-2);color:var(--ink);border:1.5px solid var(--stone);border-radius:6px;padding:6px 13px;font-size:.78rem;font-weight:700;font-family:var(--serif);transition:all .1s ease}
+  footer.foot a.foot-btn:hover{border-color:var(--ink);box-shadow:2px 2px 0 var(--ink)}
 
   :focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
 
@@ -328,6 +331,10 @@
   <footer class="foot">
     <div>One exercise. One controlled climb. One controlled descent.</div>
     <div>Tempo Ladder · Backwerd Rhythm Shop · © Backwerd Rimshot, LLC</div>
+    <div class="foot-links">
+      <a class="foot-btn" href="mailto:support@backwerdrhythmshop.com?subject=Tempo%20Ladder%20%E2%80%94%20Support%20request">Report a problem</a>
+      <a class="foot-btn" href="mailto:feedback@backwerdrhythmshop.com?subject=Tempo%20Ladder%20%E2%80%94%20Feature%20request">Request a feature</a>
+    </div>
   </footer>
 </div>
 
