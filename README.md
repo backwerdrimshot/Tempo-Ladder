@@ -11,6 +11,14 @@ Sibling app to [Pulse Pocket Metronome](https://pulse.backwerdrhythmshop.com/),
 [Click Drop](https://clickdrop.backwerdrhythmshop.com/), and
 [Grid Board](https://gridboard.backwerdrhythmshop.com/).
 
+**Use it here:** <https://tempoladder.backwerdrhythmshop.com/>
+
+## Privacy and accessibility
+
+Tempo Ladder requires no account or backend. Settings stay in the browser's local
+storage. The app supports keyboard controls, visible focus, reduced motion, phone and
+tablet layouts, classroom displays, and a best-effort screen wake lock while playing.
+
 ## How to run
 
 It's a self-contained web app — no install, no build step, no internet needed.
@@ -126,6 +134,14 @@ No notation, exercise library, sticking, rhythm building, counting systems,
 disappearing clicks, custom subdivisions or accents, extra meters, grading,
 scores, badges, challenges, accounts, or practice history. It manages tempo
 progression; the student or teacher supplies the musical content.
+
+## Planned for v1.1 — support and feedback
+
+The next release will add separate **Support** and **Feedback / Feature Request**
+controls. They must be easy to find, keyboard accessible, usable on mobile, and include
+the app name and version where possible. Final destinations will be documented after the
+intake channels are confirmed and tested. These controls are planned and are not
+represented here as shipped in the current release.
 
 ---
 
