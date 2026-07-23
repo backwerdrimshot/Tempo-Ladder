@@ -344,10 +344,8 @@
 /* Build stamp + self-documenting support/feedback emails. Progressive enhancement:
    if this script fails, the plain mailto links still work. */
 (function () {
-  function two(n) { return String(n).padStart(2, "0"); }
-  var d = new Date(document.lastModified);
-  var build = (window.__BUILD__ && String(window.__BUILD__)) ||
-    (isNaN(d.getTime()) ? "" : d.getFullYear() + "-" + two(d.getMonth() + 1) + "-" + two(d.getDate()));
+  // Update this ISO date whenever the shipped app changes.
+  var build = (window.__BUILD__ && String(window.__BUILD__)) || "2026-07-22";
 
   var footer = document.querySelector("footer");
   if (footer && build && !footer.querySelector(".build-stamp")) {

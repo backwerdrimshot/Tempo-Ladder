@@ -13,12 +13,12 @@ Sibling app to [Pulse Pocket Metronome](https://pulse.backwerdrhythmshop.com/),
 
 ## Release information
 
-- **Build:** `2026.07.22`
+- **Build:** `2026-07-22`
 - **Status:** Live
 - **Live app:** <https://tempoladder.backwerdrhythmshop.com/>
 - **Repository:** <https://github.com/backwerdrimshot/Tempo-Ladder>
 
-Build identifiers use `YYYY.MM.DD`, based on the date the documented build was updated.
+Build identifiers use ISO `YYYY-MM-DD`, based on the date the shipped app was updated.
 
 ## Privacy and accessibility
 
@@ -149,14 +149,10 @@ Production publishing is configured outside a committed Actions workflow.
 
 ## Support and feedback
 
-Support and feedback controls are planned for the next build. They are not shipped in
-build `2026.07.22`.
-
-A future build will add separate **Support** and **Feedback / Feature Request**
-controls. They must be easy to find, keyboard accessible, usable on mobile, and include
-the app name and build identifier where possible. Final destinations will be documented after the
-intake channels are confirmed and tested. These controls are planned and are not
-represented here as shipped in the current release.
+- **Report a problem** emails `support@backwerdrhythmshop.com`.
+- **Request a feature** emails `feedback@backwerdrhythmshop.com`.
+- Both controls are available in the app footer and prefill the app name, build,
+  page URL, and browser details to make follow-up easier.
 
 ## Ownership
 
