@@ -11,7 +11,17 @@ Sibling app to [Pulse Pocket Metronome](https://pulse.backwerdrhythmshop.com/),
 [Click Drop](https://clickdrop.backwerdrhythmshop.com/), and
 [Grid Board](https://gridboard.backwerdrhythmshop.com/).
 
-**Use it here:** <https://tempoladder.backwerdrhythmshop.com/>
+## Release information
+
+- **Build:** `2026-07-22`
+- **Status:** Live
+- **Live app:** <https://tempoladder.backwerdrhythmshop.com/>
+- **Public app guide:** <https://www.backwerdrhythmshop.com/app-guides/tempo-ladder>
+- **Repository:** <https://github.com/backwerdrimshot/Tempo-Ladder>
+
+Build identifiers use ISO `YYYY-MM-DD`, based on the date the shipped app update
+began. The value stays fixed while that release pass is completed across code and
+documentation.
 
 ## Privacy and accessibility
 
@@ -19,7 +29,7 @@ Tempo Ladder requires no account or backend. Settings stay in the browser's loca
 storage. The app supports keyboard controls, visible focus, reduced motion, phone and
 tablet layouts, classroom displays, and a best-effort screen wake lock while playing.
 
-## How to run
+## Local development
 
 It's a self-contained web app — no install, no build step, no internet needed.
 
@@ -114,7 +124,7 @@ or audio. Layers 3–5 live in [`js/tempoladder-app.js`](js/tempoladder-app.js).
 Tempo changes are baked into the scheduled audio timeline — never an imprecise
 UI timer flipping a BPM variable after the fact.
 
-## Tests
+## Testing
 
 The pure ladder and playback logic are covered by runner-agnostic cases in
 [`tests/cases.js`](tests/cases.js):
@@ -135,14 +145,18 @@ disappearing clicks, custom subdivisions or accents, extra meters, grading,
 scores, badges, challenges, accounts, or practice history. It manages tempo
 progression; the student or teacher supplies the musical content.
 
-## Planned for v1.1 — support and feedback
+## Deployment
 
-The next release will add separate **Support** and **Feedback / Feature Request**
-controls. They must be easy to find, keyboard accessible, usable on mobile, and include
-the app name and version where possible. Final destinations will be documented after the
-intake channels are confirmed and tested. These controls are planned and are not
-represented here as shipped in the current release.
+The static repository includes a `CNAME` for `tempoladder.backwerdrhythmshop.com`.
+Production publishing is configured outside a committed Actions workflow.
 
----
+## Support and feedback
+
+- **Report a problem** emails `support@backwerdrhythmshop.com`.
+- **Request a feature** emails `feedback@backwerdrhythmshop.com`.
+- Both controls are available in the app footer and prefill the app name, build,
+  page URL, and browser details to make follow-up easier.
+
+## Ownership
 
 © Backwerd Rimshot, LLC

@@ -1,0 +1,55 @@
+name: README standard
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate README standard
+        shell: bash
+        run: |
+          set -euo pipefail
+          required=(
+            "## Release information"
+            "## Local development"
+            "## Testing"
+            "## Privacy and accessibility"
+            "## Deployment"
+            "## Support and feedback"
+            "## Ownership"
+          )
+          for heading in "${required[@]}"; do
+            grep -Fxq "$heading" README.md || { echo "Missing $heading"; exit 1; }
+          done
+          build_count="$(grep -Ec '^- \*\*Build:\*\* `[0-9]{4}-[0-9]{2}-[0-9]{2}`$' README.md)"
+          test "$build_count" -eq 1 || { echo "README must contain exactly one ISO build date"; exit 1; }
+          build="$(grep -E '^- \*\*Build:\*\* `[0-9]{4}-[0-9]{2}-[0-9]{2}`$' README.md | sed -E 's/.*`([^`]+)`.*/\1/')"
+          test "$(date -d "$build" +%F)" = "$build" || { echo "Invalid build date: $build"; exit 1; }
+          grep -Eq '^- \*\*Status:\*\* .+$' README.md || { echo "Missing release status"; exit 1; }
+          grep -Eq '^- \*\*Live app:\*\* <https://[^>]+/?>$' README.md || { echo "Missing live app URL"; exit 1; }
+          grep -Eq '^- \*\*Public app guide:\*\* <https://www\.backwerdrhythmshop\.com/app-guides/[^>]+>$' README.md || { echo "Missing public app guide URL"; exit 1; }
+          grep -Eq '^- \*\*Repository:\*\* <https://github\.com/[^>]+>$' README.md || { echo "Missing repository URL"; exit 1; }
+          git grep -F "$build" -- . ':!README.md' ':!.github/**' ':!docs/**' >/dev/null || { echo "Build date is not present in app code"; exit 1; }
+          guide="$(grep -E '^- \*\*Public app guide:\*\* <https://www\.backwerdrhythmshop\.com/app-guides/[^>]+>$' README.md | sed -E 's/.*<([^>]+)>.*/\1/')"
+          git grep -F "$guide" -- . ':!README.md' ':!.github/**' ':!docs/**' >/dev/null || { echo "Public app guide is not linked from the app"; exit 1; }
+          grep -Fq 'support@backwerdrhythmshop.com' README.md || { echo "Missing support destination"; exit 1; }
+          grep -Fq 'feedback@backwerdrhythmshop.com' README.md || { echo "Missing feedback destination"; exit 1; }
+          ! grep -Eq 'v1\.1|controls are planned|YYYY\.MM\.DD' README.md || { echo "Stale version/support wording found"; exit 1; }
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            mapfile -t changed_app_files < <(git diff --name-only "origin/${{ github.base_ref }}...HEAD" | grep -Ev '^(README\.md|\.github/|docs/|tests/|.*\.md$)' || true)
+            if (( ${#changed_app_files[@]} )); then
+              base_build="$(git show "origin/${{ github.base_ref }}:README.md" 2>/dev/null | grep -E '^- \*\*Build:\*\* `[0-9]{4}-[0-9]{2}-[0-9]{2}`$' | sed -E 's/.*`([^`]+)`.*/\1/' || true)"
+              test "$build" != "$base_build" || { echo "App changes require a new build date"; exit 1; }
+            fi
+          fi
