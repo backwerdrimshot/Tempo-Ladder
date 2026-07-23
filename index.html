@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="description" content="One exercise. One controlled climb. One controlled descent. A symmetric slow–fast–slow tempo trainer for percussionists." />
 <meta name="theme-color" content="#142a36" />
+<link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+<link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+<link rel="manifest" href="./manifest.webmanifest" />
 <title>Tempo Ladder — Backwerd Rhythm Shop</title>
 <style>
   /* Tempo Ladder — Grid Board visual language:
@@ -46,10 +49,10 @@
   }
   .logo{
     width:56px;height:56px;border-radius:14px;flex:0 0 auto;
-    background:var(--orange);border:2px solid var(--ink);
-    display:grid;place-items:center;box-shadow:3px 3px 0 var(--ink);
+    border:2px solid var(--ink);overflow:hidden;
+    display:block;box-shadow:3px 3px 0 var(--ink);
   }
-  .logo svg{width:34px;height:34px;display:block}
+  .logo img{width:100%;height:100%;display:block;object-fit:cover}
   .brand h1{margin:0;font-size:1.7rem;letter-spacing:.2px;font-family:var(--serif)}
   .brand h1 span{color:var(--orange)}
   .brand p{margin:3px 0 0;color:var(--ink-soft);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;font-weight:700}
@@ -205,11 +208,7 @@
 
   <header class="brand">
     <span class="logo" aria-hidden="true">
-      <!-- climbing-then-descending bars -->
-      <svg viewBox="0 0 32 32" fill="none" stroke="#fffdf8" stroke-width="3" stroke-linecap="round">
-        <path d="M3 24 L11 14 L16 8 L21 14 L29 24" />
-        <path d="M3 28 L29 28" stroke-width="2.4" opacity=".7"/>
-      </svg>
+      <img src="./icon-192.png" alt="" />
     </span>
     <div>
       <h1>Tempo <span>Ladder</span></h1>
