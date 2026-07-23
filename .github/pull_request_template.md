@@ -15,3 +15,4 @@ Describe what changed and why.
 - [ ] Support and feedback destinations are still correct.
 - [ ] Deployment and privacy/accessibility statements remain accurate.
 - [ ] The Notion README Tracker was updated.
+- [ ] The Notion Public App Guide and published Squarespace guide were updated if user-facing behavior changed.
