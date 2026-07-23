@@ -13,7 +13,7 @@ Sibling app to [Pulse Pocket Metronome](https://pulse.backwerdrhythmshop.com/),
 
 ## Release information
 
-- **Build:** `2026-07-22`
+- **Build:** `2026-07-23`
 - **Status:** Live
 - **Live app:** <https://tempoladder.backwerdrhythmshop.com/>
 - **Public app guide:** <https://www.backwerdrhythmshop.com/app-guides/tempo-ladder>
