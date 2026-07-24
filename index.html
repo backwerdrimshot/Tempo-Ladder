@@ -344,14 +344,8 @@
 /* Build stamp + self-documenting support/feedback emails. Progressive enhancement:
    if this script fails, the plain mailto links still work. */
 (function () {
-  // The build date comes from the document's Last-Modified header, so it
-  // updates itself on every deploy. window.__BUILD__ can override it with a
-  // real git SHA if a build step is wired later.
-  function two(n) { return String(n).padStart(2, "0"); }
-  var modified = new Date(document.lastModified);
-  var build = (window.__BUILD__ && String(window.__BUILD__)) ||
-    (isNaN(modified.getTime()) ? "" :
-      modified.getFullYear() + "-" + two(modified.getMonth() + 1) + "-" + two(modified.getDate()));
+  // Update this ISO date whenever the shipped app changes.
+  var build = (window.__BUILD__ && String(window.__BUILD__)) || "2026-07-23";
 
   var footer = document.querySelector("footer");
   if (footer && build && !footer.querySelector(".build-stamp")) {
