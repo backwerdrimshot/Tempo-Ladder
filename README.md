@@ -157,6 +157,16 @@ Production publishing is configured outside a committed Actions workflow.
 - Both controls are available in the app footer and prefill the app name, build,
   page URL, and browser details to make follow-up easier.
 
+## Follow
+
+Backwerd Rhythm Shop posts practice ideas, new app releases, and classroom tips:
+
+- Facebook — <https://www.facebook.com/backwerdrhythmshop/>
+- Instagram — <https://www.instagram.com/backwerdrhythmshop/>
+- YouTube — <https://www.youtube.com/@backwerdrhythmshop>
+
+These three links also appear as icon buttons in the app footer.
+
 ## Ownership
 
 © Backwerd Rimshot, LLC
