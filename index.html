@@ -377,5 +377,35 @@
   });
 })();
 </script>
+<script>
+/* Visit counter (progressive enhancement). Counts once per browser session via the
+   shared Backwerd counter Worker. Dev machines only read, so local testing never
+   inflates the number. If the endpoint is unreachable — offline, blocked, or not
+   deployed yet — the footer is left exactly as it was. */
+(function () {
+  var APP = "tempoladder";
+  var API = "https://counter.backwerdrhythmshop.com";
+
+  var dev = /^(localhost|127\.|0\.0\.0\.0)/.test(location.hostname)
+    || location.protocol === "file:";
+  var counted = false;
+  try { counted = sessionStorage.getItem("brs-counted") === "1"; } catch (e) {}
+
+  fetch(API + ((dev || counted) ? "/count" : "/hit") + "?app=" + APP, { cache: "no-store" })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) {
+      if (!d || typeof d.count !== "number" || d.count < 1) return;
+      if (!dev) { try { sessionStorage.setItem("brs-counted", "1"); } catch (e) {} }
+      var host = document.querySelector("footer .build-stamp");
+      if (!host || host.querySelector(".visit-count")) return;
+      var span = document.createElement("span");
+      span.className = "visit-count";
+      span.textContent = " \u00b7 " + d.count.toLocaleString()
+        + " visit" + (d.count === 1 ? "" : "s");
+      host.appendChild(span);
+    })
+    .catch(function () {});
+})();
+</script>
 </body>
 </html>
