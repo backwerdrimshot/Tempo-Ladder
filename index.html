@@ -194,6 +194,32 @@
   footer.foot a.foot-btn.foot-ico{padding:8px;border-radius:50%;gap:0;line-height:0}
   footer.foot a.foot-btn.foot-ico svg{width:16px;height:16px;display:block}
 
+  /* Support fallback panel. A bare mailto: fails silently on machines without a
+     registered email app, so the footer support links open this panel; the
+     mailto stays one click away and the message can be copied anywhere. */
+  .support-dialog{
+    width:min(560px,calc(100vw - 32px));border:2px solid var(--ink);border-radius:12px;
+    padding:20px;background:var(--paper-2);color:var(--ink);box-shadow:var(--shadow)
+  }
+  .support-dialog::backdrop{background:rgba(20,42,54,.45)}
+  .support-dialog h2{margin:0 0 8px;font-size:1.05rem}
+  .support-dialog .support-dialog-lede,
+  .support-dialog .support-dialog-hint{margin:0 0 12px;color:var(--ink-soft);font-size:.85rem}
+  .support-dialog .support-dialog-hint{margin:12px 0 0}
+  .support-dialog .support-dialog-label{display:block;font-size:.78rem;font-weight:700}
+  .support-dialog textarea{
+    display:block;width:100%;margin-top:6px;padding:10px;border:1.5px solid var(--stone);
+    border-radius:8px;background:var(--paper);color:var(--ink);font:inherit;font-size:.85rem;resize:vertical
+  }
+  .support-dialog textarea:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
+  .support-dialog .support-dialog-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .support-dialog .foot-btn{
+    display:inline-flex;align-items:center;gap:6px;text-decoration:none;background:var(--paper-2);
+    color:var(--ink);border:1.5px solid var(--stone);border-radius:6px;padding:6px 13px;
+    font-size:.78rem;font-weight:700;font-family:var(--serif);transition:all .1s ease;cursor:pointer
+  }
+  .support-dialog .foot-btn:hover{border-color:var(--ink);box-shadow:2px 2px 0 var(--ink)}
+
   :focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
 
   /* Fullscreen presentation */
@@ -350,7 +376,7 @@
    if this script fails, the plain mailto links still work. */
 (function () {
   // Update this ISO date whenever the shipped app changes.
-  var build = (window.__BUILD__ && String(window.__BUILD__)) || "2026-07-23";
+  var build = (window.__BUILD__ && String(window.__BUILD__)) || "2026-07-26";
 
   var footer = document.querySelector("footer");
   if (footer && build && !footer.querySelector(".build-stamp")) {
@@ -374,6 +400,90 @@
       + "App: " + app + "\nBuild: " + (build || "unknown")
       + "\nPage: " + location.href + "\nBrowser: " + navigator.userAgent;
     a.setAttribute("href", href + "&body=" + encodeURIComponent(body));
+  });
+})();
+</script>
+<script>
+/* Support fallback panel. Progressive enhancement: without native dialog support,
+   the rewritten mailto links above retain their normal behavior. */
+(function () {
+  if (!("HTMLDialogElement" in window)) return;
+
+  var dialog = document.createElement("dialog");
+  dialog.className = "support-dialog";
+  dialog.setAttribute("aria-labelledby", "support-dialog-title");
+  dialog.innerHTML =
+    '<h2 id="support-dialog-title"></h2>' +
+    '<p class="support-dialog-lede">' +
+      'Open your email app below — or copy the message and paste it into any ' +
+      'email (webmail included) addressed to ' +
+      '<strong class="support-dialog-address"></strong>.' +
+    '</p>' +
+    '<label class="support-dialog-label">Message' +
+      '<textarea class="support-dialog-body" rows="9" spellcheck="false"></textarea>' +
+    '</label>' +
+    '<div class="support-dialog-actions">' +
+      '<a class="foot-btn support-dialog-open" href="#">Open in my email app</a>' +
+      '<button type="button" class="foot-btn support-dialog-copy">Copy details</button>' +
+      '<button type="button" class="foot-btn support-dialog-close">Close</button>' +
+    '</div>' +
+    '<p class="support-dialog-hint">' +
+      'Nothing opens? This device has no email app set up — use ' +
+      '“Copy details” and paste into the email service you use.' +
+    '</p>';
+  document.body.appendChild(dialog);
+
+  var dialogTitle = dialog.querySelector("#support-dialog-title");
+  var addressEl = dialog.querySelector(".support-dialog-address");
+  var bodyField = dialog.querySelector(".support-dialog-body");
+  var openLink = dialog.querySelector(".support-dialog-open");
+  var copyButton = dialog.querySelector(".support-dialog-copy");
+  var closeButton = dialog.querySelector(".support-dialog-close");
+
+  var address = "";
+  var subject = "";
+
+  function currentMailto() {
+    return "mailto:" + address + "?subject=" + encodeURIComponent(subject)
+      + "&body=" + encodeURIComponent(bodyField.value);
+  }
+
+  closeButton.addEventListener("click", function () { dialog.close(); });
+  dialog.addEventListener("click", function (event) {
+    if (event.target === dialog) dialog.close();
+  });
+  openLink.addEventListener("click", function () {
+    openLink.setAttribute("href", currentMailto());
+  });
+  copyButton.addEventListener("click", async function () {
+    var text = "To: " + address + "\nSubject: " + subject + "\n\n" + bodyField.value;
+    try {
+      await navigator.clipboard.writeText(text);
+      copyButton.textContent = "Copied ✓";
+    } catch (error) {
+      bodyField.select();
+      copyButton.textContent = "Press Ctrl+C to copy";
+    }
+    window.setTimeout(function () {
+      copyButton.textContent = "Copy details";
+    }, 2000);
+  });
+
+  document.querySelectorAll('a[href^="mailto:"]').forEach(function (link) {
+    if (!/support@|feedback@/.test(link.getAttribute("href") || "")) return;
+    link.addEventListener("click", function (event) {
+      event.preventDefault();
+      var url = new URL(link.getAttribute("href") || "");
+      address = url.pathname;
+      subject = url.searchParams.get("subject") || "";
+      bodyField.value = url.searchParams.get("body") || "";
+      dialogTitle.textContent = link.textContent.trim() || "Contact us";
+      addressEl.textContent = address;
+      openLink.setAttribute("href", currentMailto());
+      dialog.showModal();
+      bodyField.setSelectionRange(0, 0);
+      bodyField.scrollTop = 0;
+    });
   });
 })();
 </script>
