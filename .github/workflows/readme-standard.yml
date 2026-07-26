@@ -32,10 +32,18 @@ jobs:
           for heading in "${required[@]}"; do
             grep -Fxq "$heading" README.md || { echo "Missing $heading"; exit 1; }
           done
-          build_count="$(grep -Ec '^- \*\*Build:\*\* `[0-9]{4}-[0-9]{2}-[0-9]{2}`$' README.md)"
-          test "$build_count" -eq 1 || { echo "README must contain exactly one ISO build date"; exit 1; }
-          build="$(grep -E '^- \*\*Build:\*\* `[0-9]{4}-[0-9]{2}-[0-9]{2}`$' README.md | sed -E 's/.*`([^`]+)`.*/\1/')"
-          test "$(date -d "$build" +%F)" = "$build" || { echo "Invalid build date: $build"; exit 1; }
+          # Build identifier: an ISO date, plus a counter for later builds on the
+          # same date — 2026-07-26, then 2026-07-26.2, 2026-07-26.3, ...
+          build_pattern='^- \*\*Build:\*\* `[0-9]{4}-[0-9]{2}-[0-9]{2}(\.[0-9]+)?`$'
+          build_count="$(grep -Ec "$build_pattern" README.md)"
+          test "$build_count" -eq 1 || { echo "README must contain exactly one build identifier"; exit 1; }
+          build="$(grep -E "$build_pattern" README.md | sed -E 's/.*`([^`]+)`.*/\1/')"
+          build_date="${build%%.*}"
+          build_pass="${build#"$build_date"}"
+          test "$(date -d "$build_date" +%F)" = "$build_date" || { echo "Invalid build date: $build"; exit 1; }
+          if [[ -n "$build_pass" ]]; then
+            [[ "$build_pass" =~ ^\.([2-9]|[1-9][0-9]+)$ ]] || { echo "Invalid same-day build counter: $build (the first build of a date carries no suffix; later ones use .2, .3, ...)"; exit 1; }
+          fi
           grep -Eq '^- \*\*Status:\*\* .+$' README.md || { echo "Missing release status"; exit 1; }
           grep -Eq '^- \*\*Live app:\*\* <https://[^>]+/?>$' README.md || { echo "Missing live app URL"; exit 1; }
           grep -Eq '^- \*\*Public app guide:\*\* <https://www\.backwerdrhythmshop\.com/app-guides/[^>]+>$' README.md || { echo "Missing public app guide URL"; exit 1; }
@@ -49,7 +57,7 @@ jobs:
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             mapfile -t changed_app_files < <(git diff --name-only "origin/${{ github.base_ref }}...HEAD" | grep -Ev '^(README\.md|\.github/|docs/|tests/|.*\.md$)' || true)
             if (( ${#changed_app_files[@]} )); then
-              base_build="$(git show "origin/${{ github.base_ref }}:README.md" 2>/dev/null | grep -E '^- \*\*Build:\*\* `[0-9]{4}-[0-9]{2}-[0-9]{2}`$' | sed -E 's/.*`([^`]+)`.*/\1/' || true)"
-              test "$build" != "$base_build" || { echo "App changes require a new build date"; exit 1; }
+              base_build="$(git show "origin/${{ github.base_ref }}:README.md" 2>/dev/null | grep -E "$build_pattern" | sed -E 's/.*`([^`]+)`.*/\1/' || true)"
+              test "$build" != "$base_build" || { echo "App changes require a new build identifier (bump the date, or add/raise the same-day counter: ${base_build}.2)"; exit 1; }
             fi
           fi

@@ -23,7 +23,9 @@
 <div id="summary">Running…</div>
 <ul id="results"></ul>
 <script src="../js/tempoladder-core.js"></script>
+<script src="../js/tempoladder-link.js"></script>
 <script src="cases.js"></script>
+<script src="link-cases.js"></script>
 <script>
 "use strict";
 // Minimal assert shim matching the subset the cases use.
@@ -37,14 +39,19 @@ const assert = {
   },
 };
 
-const cases = TempoLadderTests.getCases(TempoLadderCore);
+const cases = TempoLadderTests.getCases(TempoLadderCore)
+  .map((c) => ({ name: c.name, fn: (a) => c.fn(a, TempoLadderCore) }))
+  .concat(
+    TempoLadderLinkTests.getLinkCases(TempoLadderLink)
+      .map((c) => ({ name: c.name, fn: (a) => c.fn(a, TempoLadderLink) })),
+  );
 const list = document.getElementById("results");
 let passed = 0, failed = 0;
 for (const c of cases) {
   const li = document.createElement("li");
   li.textContent = c.name;
   try {
-    c.fn(assert, TempoLadderCore);
+    c.fn(assert);
     li.className = "pass"; passed++;
   } catch (e) {
     li.className = "fail"; failed++;
