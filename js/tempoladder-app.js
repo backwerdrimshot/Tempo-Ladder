@@ -5,13 +5,15 @@
      Core       — buildLadder + createLadderPlayback (pure, no DOM/audio)
      scheduler  — schedules clicks on the AudioContext timeline (source of truth)
      visual Q   — timestamped events flushed at hear-time
-     DOM render — renderNow() only                                            */
+     DOM render — renderNow() only
+     Link       — settings resolution + shareable link (pure, no DOM/audio)    */
 var Core = window.TempoLadderCore;
+var Link = window.TempoLadderLink;
 var BEATS = Core.BEATS_PER_MEASURE; // 4
 
 /* ---------------- settings ---------------- */
-var DEFAULTS = { startBpm: 60, peakBpm: 100, stepBpm: 5, measuresPerTempo: 8, mode: "step" };
-var settings = Object.assign({}, DEFAULTS);
+var DEFAULTS = Link.defaults();
+var settings = Link.defaults();
 
 var $ = function (id) { return document.getElementById(id); };
 
@@ -368,6 +370,7 @@ function readSettings() {
   settings.startBpm = clampField("startBpm");
   settings.peakBpm = clampField("peakBpm");
   settings.stepBpm = clampField("stepBpm");
+  settings.label = Link.normalizeLabel($("exerciseLabel").value);
 }
 function setErr(m) { $("setupErr").textContent = m; }
 function clearErr() { $("setupErr").textContent = ""; $("sessionErr").textContent = ""; }
@@ -375,6 +378,7 @@ function clearErr() { $("setupErr").textContent = ""; $("sessionErr").textConten
 function syncPreview() {
   readSettings();
   persistSettings();
+  renderLabel();
   var wrap = $("preview");
   var ok = settings.peakBpm > settings.startBpm;
   $("btnStart").disabled = !ok;
@@ -429,6 +433,9 @@ document.querySelectorAll("button.step").forEach(function (b) {
   $(id).addEventListener("input", syncPreview);
   $(id).addEventListener("change", syncPreview);
 });
+// syncPreview re-reads every setting, persists them, and repaints the label,
+// so the caption is remembered exactly like the tempo fields are.
+$("exerciseLabel").addEventListener("input", syncPreview);
 wireSeg("segMeasures", "measuresPerTempo");
 wireSeg("segMode", "mode", updateModeHint);
 
@@ -440,8 +447,12 @@ function updateModeHint() {
 
 /* ---------------- remembered settings + shareable link ----------------
    Last-used settings persist to localStorage so a returning student isn't
-   re-entering them. A shareable link encodes the five settings in the URL so a
-   teacher can hand out one climb; opening it pre-fills the setup screen. */
+   re-entering them. A shareable link encodes the settings in the URL so a
+   teacher can hand out one climb; opening it pre-fills the setup screen.
+
+   The validation and the query format live in TempoLadderLink, which is pure
+   and covered by tests/link-cases.js — a hand-edited URL is the one input this
+   app takes from a stranger. */
 var STORE_KEY = "tempoladder-settings";
 
 function persistSettings() {
@@ -451,36 +462,12 @@ function loadSaved() {
   try { return JSON.parse(localStorage.getItem(STORE_KEY)); } catch (e) { return null; }
 }
 
-// Clamp a value to an integer range; return null for missing/garbage so callers
-// leave the existing setting untouched.
-function toInt(v, lo, hi) {
-  if (v === null || v === undefined || v === "") return null;
-  var n = Math.round(+v);
-  if (!isFinite(n)) return null;
-  return Math.max(lo, Math.min(hi, n));
-}
 // Fold a raw {startBpm,...}-shaped object into settings, validating each field.
 function coerceSettings(raw) {
-  if (!raw || typeof raw !== "object") return;
-  var n;
-  if ((n = toInt(raw.startBpm, 30, 300)) !== null) settings.startBpm = n;
-  if ((n = toInt(raw.peakBpm,  30, 300)) !== null) settings.peakBpm = n;
-  if ((n = toInt(raw.stepBpm,   1,  30)) !== null) settings.stepBpm = n;
-  if ([4, 8, 16].indexOf(+raw.measuresPerTempo) !== -1) settings.measuresPerTempo = +raw.measuresPerTempo;
-  if (raw.mode === "step" || raw.mode === "nonstop") settings.mode = raw.mode;
-}
-// Read a shared link's query params into a raw settings-shaped object.
-function queryToRaw() {
-  var q = new URLSearchParams(location.search);
-  return {
-    startBpm: q.get("start"), peakBpm: q.get("peak"), stepBpm: q.get("step"),
-    measuresPerTempo: q.get("measures"), mode: q.get("mode"),
-  };
+  settings = Link.applySettings(settings, raw);
 }
 function shareUrl() {
-  return location.origin + location.pathname +
-    "?start=" + settings.startBpm + "&peak=" + settings.peakBpm + "&step=" + settings.stepBpm +
-    "&measures=" + settings.measuresPerTempo + "&mode=" + settings.mode;
+  return location.origin + location.pathname + "?" + Link.buildShareQuery(settings);
 }
 
 // Reflect the resolved settings into the setup controls.
@@ -493,8 +480,22 @@ function hydrateControls() {
   $("startBpm").value = settings.startBpm;
   $("peakBpm").value = settings.peakBpm;
   $("stepBpm").value = settings.stepBpm;
+  $("exerciseLabel").value = settings.label;
   setSeg("segMeasures", String(settings.measuresPerTempo));
   setSeg("segMode", settings.mode);
+  renderLabel();
+}
+
+/* The label is the one thing on screen that came from whoever wrote the link,
+   so it is only ever assigned as text — never markup — and it is hidden
+   entirely when empty rather than leaving a blank caption on the projector. */
+function renderLabel() {
+  var text = settings.label;
+  var nodes = [$("setupLabelEcho"), $("sessionLabel"), $("doneLabel")];
+  for (var i = 0; i < nodes.length; i++) {
+    nodes[i].textContent = text;
+    nodes[i].hidden = !text;
+  }
 }
 
 // Copy the shareable link, with a clipboard-API path and an execCommand fallback
@@ -559,7 +560,7 @@ document.addEventListener("visibilitychange", function () {
    link's query params. Reflect the resolved settings into the controls, then
    render the preview. */
 coerceSettings(loadSaved());
-coerceSettings(queryToRaw());
+coerceSettings(Link.queryToRaw(location.search));
 hydrateControls();
 updateModeHint();
 syncPreview();

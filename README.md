@@ -13,7 +13,7 @@ Sibling app to [Pulse Pocket Metronome](https://pulse.backwerdrhythmshop.com/),
 
 ## Release information
 
-- **Build:** `2026-07-26`
+- **Build:** `2026-07-26.2`
 - **Status:** Live
 - **Live app:** <https://tempoladder.backwerdrhythmshop.com/>
 - **Public app guide:** <https://www.backwerdrhythmshop.com/app-guides/tempo-ladder>
@@ -22,6 +22,11 @@ Sibling app to [Pulse Pocket Metronome](https://pulse.backwerdrhythmshop.com/),
 Build identifiers use ISO `YYYY-MM-DD`, based on the date the shipped app update
 began. The value stays fixed while that release pass is completed across code and
 documentation.
+
+A second release on the same date appends a counter: `2026-07-26`, then
+`2026-07-26.2`, `2026-07-26.3`. The first build of a date carries no suffix. Use the
+counter rather than dating a release in the future — an app-changing release only
+needs an identifier different from the one on `main`.
 
 ## Privacy and accessibility
 
@@ -103,6 +108,12 @@ shows a warning:
   `…/index.html?start=60&peak=100&step=5&measures=8&mode=step`. Hand one to a
   student and they get exactly the ladder you set. A shared link wins over
   remembered settings.
+- **What are you playing?** — an optional label ("Line 4", "single-stroke roll",
+  "Bach, m. 12"). It shows while the ladder runs and travels with the link as
+  `&label=…`, so a student opening your ladder knows what it is for. Tempo Ladder
+  still supplies no musical content — this is a caption for material that lives
+  outside the app, and it is the natural place to name an exercise built in
+  [Grid Board](https://gridboard.backwerdrhythmshop.com/).
 - **Stays awake** — while a session plays, the screen is kept from sleeping
   (best-effort, where the browser supports it) so a phone on a music stand
   doesn't dim mid-climb.
@@ -127,10 +138,14 @@ UI timer flipping a BPM variable after the fact.
 ## Testing
 
 The pure ladder and playback logic are covered by runner-agnostic cases in
-[`tests/cases.js`](tests/cases.js):
+[`tests/cases.js`](tests/cases.js), and the settings/link logic by
+[`tests/link-cases.js`](tests/link-cases.js):
 
 - **In a browser:** open [`tests/test.html`](tests/test.html) — no tooling needed.
-- **With Node:** `node --test tests/`
+- **With Node:** `node --test "tests/*.test.cjs"`
+
+Quote the pattern so Node expands it: a bare `node --test tests/` fails on current
+Node, and PowerShell does not expand globs for you.
 
 They verify the required behavior: the `60,65,70,65,60` example, an off-grid
 peak included exactly once, the start tempo at both ends, one Step-Mode

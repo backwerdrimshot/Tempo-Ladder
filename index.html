@@ -75,6 +75,20 @@
   @media(max-width:720px){.setup-grid{grid-template-columns:1fr 1fr}}
   @media(max-width:460px){.setup-grid{grid-template-columns:1fr}}
   .field label{display:block;font-weight:700;font-size:.9rem;margin-bottom:7px}
+  .field-wide{grid-column:1/-1}
+  .field .opt{font-weight:600;font-size:.78rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em}
+  #exerciseLabel{
+    width:100%;font-family:inherit;font-size:1rem;font-weight:700;
+    padding:9px 11px;border:2px solid var(--ink);border-radius:8px;
+    background:var(--paper-2);color:var(--ink);
+  }
+  /* What the student is playing while the ladder runs. Text only — it can
+     arrive from a link someone else wrote. */
+  .exercise-label{
+    margin:0 0 10px;text-align:center;font-family:var(--serif);font-style:italic;
+    font-size:clamp(1.05rem,2.4vw,1.5rem);color:var(--orange-deep);
+    overflow-wrap:anywhere;
+  }
   .num-row{display:flex;align-items:stretch;gap:8px}
   .num-row input[type=number]{
     flex:1;min-width:0;font-family:inherit;font-size:1.4rem;font-weight:800;
@@ -293,11 +307,17 @@
           <label>&nbsp;</label>
           <p class="hint" id="modeHint">Step adds one click-only reset measure at the new tempo between rungs.</p>
         </div>
+        <div class="field field-wide">
+          <label for="exerciseLabel">What are you playing? <span class="opt">optional</span></label>
+          <input id="exerciseLabel" type="text" maxlength="80" autocomplete="off" placeholder="Line 4 · single-stroke roll · Bach, m. 12" />
+          <p class="hint">Shown while the ladder runs, and carried by Copy link — so a student opening your link knows what to play.</p>
+        </div>
       </div>
     </div>
 
     <div class="panel">
       <h2>The ladder</h2>
+      <p class="exercise-label" id="setupLabelEcho" hidden></p>
       <div class="preview" id="preview" aria-live="polite"></div>
       <p class="meta" id="previewMeta"></p>
       <div class="start-row">
@@ -312,6 +332,7 @@
   <!-- ============ SESSION ============ -->
   <section id="screenSession" hidden>
     <div class="panel">
+      <p class="exercise-label" id="sessionLabel" hidden></p>
       <div class="session-top">
         <div class="bpm-block">
           <div class="bpm-huge" id="curBpm" aria-live="off">60<small>BPM</small></div>
@@ -347,6 +368,7 @@
         <div class="mark" aria-hidden="true">▲</div>
         <h2>Ladder complete</h2>
       </div>
+      <p class="exercise-label" id="doneLabel" hidden></p>
       <p class="done-summary" id="doneSummary"></p>
       <div class="transport">
         <button class="btn big primary" id="btnReplay" type="button">Replay</button>
@@ -370,13 +392,14 @@
 </div>
 
 <script src="js/tempoladder-core.js"></script>
+<script src="js/tempoladder-link.js"></script>
 <script src="js/tempoladder-app.js"></script>
 <script>
 /* Build stamp + self-documenting support/feedback emails. Progressive enhancement:
    if this script fails, the plain mailto links still work. */
 (function () {
   // Update this ISO date whenever the shipped app changes.
-  var build = (window.__BUILD__ && String(window.__BUILD__)) || "2026-07-26";
+  var build = (window.__BUILD__ && String(window.__BUILD__)) || "2026-07-26.2";
 
   var footer = document.querySelector("footer");
   if (footer && build && !footer.querySelector(".build-stamp")) {
