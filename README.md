@@ -20,13 +20,9 @@ Sibling app to [Pulse Pocket Metronome](https://pulse.backwerdrhythmshop.com/),
 - **Repository:** <https://github.com/backwerdrimshot/Tempo-Ladder>
 
 Build identifiers use ISO `YYYY-MM-DD`, based on the date the shipped app update
-began. The value stays fixed while that release pass is completed across code and
-documentation.
-
-A second release on the same date appends a counter: `2026-07-26`, then
-`2026-07-26.2`, `2026-07-26.3`. The first build of a date carries no suffix. Use the
-counter rather than dating a release in the future — an app-changing release only
-needs an identifier different from the one on `main`.
+began, with `.2`, `.3`, and so on for later same-day releases. They identify
+user-facing app releases and are not coupled to infrastructure-only or documentation
+changes. The README and app footer must still agree.
 
 ## Privacy and accessibility
 
@@ -36,11 +32,22 @@ tablet layouts, classroom displays, and a best-effort screen wake lock while pla
 
 ## Local development
 
-It's a self-contained web app — no install, no build step, no internet needed.
+The application remains a static HTML, JavaScript, and PWA asset bundle. Node and
+Wrangler provide a production-equivalent local server and an explicit asset build.
 
-- **Double-click `index.html`** — it opens in your default browser and works
-  fully, audio included (Chrome, Edge, Firefox, Safari).
-- Or serve it locally (handy for phones on the same network):
+```sh
+pnpm install --frozen-lockfile
+pnpm dev
+```
+
+`pnpm dev` builds the allowlisted site assets, watches them for changes, and starts
+Wrangler's local server. Use `pnpm build` for a production build in `dist/` and
+`pnpm preview` to serve a fresh production build without source watching.
+
+The original zero-tool options remain available:
+
+- Double-click `index.html` to run directly from `file://`.
+- Or serve it locally with the PowerShell helper:
 
   ```powershell
   powershell -ExecutionPolicy Bypass -File serve.ps1
@@ -142,10 +149,11 @@ The pure ladder and playback logic are covered by runner-agnostic cases in
 [`tests/link-cases.js`](tests/link-cases.js):
 
 - **In a browser:** open [`tests/test.html`](tests/test.html) — no tooling needed.
-- **With Node:** `node --test "tests/*.test.cjs"`
+- **With Node:** `pnpm test`
+- **Complete validation:** `pnpm check`
 
-Quote the pattern so Node expands it: a bare `node --test tests/` fails on current
-Node, and PowerShell does not expand globs for you.
+`pnpm check` runs static lint and workflow/YAML checks, all Node tests, a production
+build, and a Wrangler deployment dry run.
 
 They verify the required behavior: the `60,65,70,65,60` example, an off-grid
 peak included exactly once, the start tempo at both ends, one Step-Mode
@@ -162,8 +170,22 @@ progression; the student or teacher supplies the musical content.
 
 ## Deployment
 
-The static repository includes a `CNAME` for `tempoladder.backwerdrhythmshop.com`.
-Production publishing is configured outside a committed Actions workflow.
+Cloudflare Workers Static Assets serves the production `dist/` allowlist. There is no
+Worker script, API, database, authentication, or server-side application code.
+
+- `wrangler.jsonc` names the Worker `tempo-ladder`, uses compatibility date
+  `2026-07-26`, and serves `./dist` with normal 404 handling.
+- `pnpm deploy:dry-run` validates the deployment bundle without uploading it.
+- `pnpm deploy` builds and deploys the Worker.
+- The manually triggered **Deploy to Cloudflare Workers** workflow performs the same
+  validated production deployment. Configure its
+  `cloudflare-workers-production` environment with `CLOUDFLARE_API_TOKEN` and
+  `CLOUDFLARE_ACCOUNT_ID` secrets.
+
+The existing GitHub Pages deployment remains active as a fallback and publishes the
+same allowlisted site plus `CNAME` from `main`. The committed `CNAME` continues to
+document and preserve `tempoladder.backwerdrhythmshop.com`; it is intentionally not
+included in Workers production assets.
 
 ## Support and feedback
 

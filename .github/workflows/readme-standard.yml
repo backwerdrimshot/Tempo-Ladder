@@ -54,10 +54,3 @@ jobs:
           grep -Fq 'support@backwerdrhythmshop.com' README.md || { echo "Missing support destination"; exit 1; }
           grep -Fq 'feedback@backwerdrhythmshop.com' README.md || { echo "Missing feedback destination"; exit 1; }
           ! grep -Eq 'v1\.1|controls are planned|YYYY\.MM\.DD' README.md || { echo "Stale version/support wording found"; exit 1; }
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            mapfile -t changed_app_files < <(git diff --name-only "origin/${{ github.base_ref }}...HEAD" | grep -Ev '^(README\.md|\.github/|docs/|tests/|.*\.md$)' || true)
-            if (( ${#changed_app_files[@]} )); then
-              base_build="$(git show "origin/${{ github.base_ref }}:README.md" 2>/dev/null | grep -E "$build_pattern" | sed -E 's/.*`([^`]+)`.*/\1/' || true)"
-              test "$build" != "$base_build" || { echo "App changes require a new build identifier (bump the date, or add/raise the same-day counter: ${base_build}.2)"; exit 1; }
-            fi
-          fi

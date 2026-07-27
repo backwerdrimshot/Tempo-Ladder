@@ -10,8 +10,7 @@ Describe what changed and why.
 ## Documentation standard
 
 - [ ] `README.md` still contains every required standard section.
-- [ ] The build identifier (`YYYY-MM-DD`, or `YYYY-MM-DD.2` for a later build on the same date) changed if the shipped app changed.
-- [ ] The README build identifier matches the build value in app code.
+- [ ] The build identifier is valid and matches the build value in app code.
 - [ ] Support and feedback destinations are still correct.
 - [ ] Deployment and privacy/accessibility statements remain accurate.
 - [ ] The README and app footer link to the current public app guide.

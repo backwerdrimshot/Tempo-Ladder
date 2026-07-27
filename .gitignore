@@ -2,3 +2,12 @@
 .claude/
 .vscode/
 serve.log
+
+# Generated local/deployment output
+node_modules/
+dist/
+.wrangler/
+
+# Local Cloudflare credentials and environment values
+.dev.vars*
+.env*
