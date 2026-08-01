@@ -28,10 +28,19 @@
     --paper-2:#fffdf8;      /* raised cream / panels */
     --card:#fbf7ef;         /* panel paper */
     --ink:#142a36;          /* deep navy ink */
-    --ink-soft:#58707b;     /* steel-blue muted text */
-    --ink-faint:#8ca1aa;
+    /* One notch deeper than the #58707b this used to be: on the cream page
+       wash that was 4.25:1, and the tagline and the brand line sit on it. */
+    --ink-soft:#4f6873;     /* steel-blue muted text */
+    /* There is no third text tier. --ink-faint was #8ca1aa and both uses of it
+       were text — the footer and the preview arrow — at 2.19:1 and 2.52:1. It
+       could not be darkened to the 4.5:1 floor without landing on top of
+       --ink-soft, because warm paper has room for two readable tiers under
+       --ink and not three, so the tier is gone and both read as --ink-soft.
+       If something needs to recede, use size, weight, or space; do not reach
+       for a lighter ink. */
     --orange:#f36f3d;       /* burnt orange */
-    --orange-deep:#c94b20;
+    --orange-deep:#c94b20;  /* orange as a FILL, under paper-coloured type */
+    --orange-ink:#ad3d0d;   /* orange as TEXT, on paper — --orange-deep is 3.91:1 there */
     --sage:#cfe1d4;         /* muted sage — selected states */
     --sage-deep:#a9d8c0;
     --stone:#d8d0c3;        /* soft stone borders */
@@ -65,7 +74,7 @@
   }
   .logo img{width:100%;height:100%;display:block;object-fit:cover}
   .brand h1{margin:0;font-size:1.7rem;letter-spacing:.2px;font-family:var(--serif)}
-  .brand h1 span{color:var(--orange)}
+  .brand h1 span{color:var(--orange-deep)}
   .brand p{margin:3px 0 0;color:var(--ink-soft);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;font-weight:700}
   .brand .fs{margin-left:auto}
 
@@ -97,7 +106,7 @@
      arrive from a link someone else wrote. */
   .exercise-label{
     margin:0 0 10px;text-align:center;font-family:var(--serif);font-style:italic;
-    font-size:clamp(1.05rem,2.4vw,1.5rem);color:var(--orange-deep);
+    font-size:clamp(1.05rem,2.4vw,1.5rem);color:var(--orange-ink);
     overflow-wrap:anywhere;
   }
   .num-row{display:flex;align-items:stretch;gap:8px}
@@ -131,8 +140,8 @@
   /* Ladder preview + Start */
   .preview{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;margin-top:4px;font-variant-numeric:tabular-nums}
   .preview .rung{font-weight:800;font-size:1.05rem}
-  .preview .arrow{color:var(--ink-faint)}
-  .preview .peak{color:var(--orange-deep)}
+  .preview .arrow{color:var(--ink-soft)}
+  .preview .peak{color:var(--orange-ink)}
   .meta{color:var(--ink-soft);font-size:.9rem;margin-top:10px}
   .start-row{display:flex;gap:14px;align-items:center;margin-top:18px;flex-wrap:wrap}
   .btn{
@@ -145,7 +154,7 @@
   .btn.primary:hover:not(:disabled){background:var(--orange-deep)}
   .btn.ghost{background:var(--paper-2);color:var(--ink);padding:12px 22px;font-size:.95rem}
   .btn.ghost:hover:not(:disabled){background:var(--sage)}
-  .err{color:var(--orange-deep);font-weight:700;font-size:.9rem}
+  .err{color:var(--orange-ink);font-weight:700;font-size:.9rem}
 
   /* ---------------- Session screen ---------------- */
   #screenSession[hidden],#screenSetup[hidden],#screenDone[hidden]{display:none}
@@ -155,7 +164,7 @@
   .bpm-huge{font-size:clamp(4rem,16vw,9rem);font-weight:800;line-height:.9;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
   .bpm-huge small{font-size:.22em;color:var(--ink-soft);font-weight:800;letter-spacing:.1em;vertical-align:.7em;margin-left:.15em}
   .dir-word{font-family:var(--serif);font-style:italic;font-size:clamp(1.3rem,4vw,2.1rem);color:var(--ink-soft)}
-  .dir-word.peak{color:var(--orange-deep);font-style:normal;font-weight:800;text-transform:uppercase;letter-spacing:.04em;font-family:inherit}
+  .dir-word.peak{color:var(--orange-ink);font-style:normal;font-weight:800;text-transform:uppercase;letter-spacing:.04em;font-family:inherit}
   .next-chip{
     justify-self:end;text-align:center;border:2px solid var(--ink);border-radius:12px;
     padding:12px 20px;background:var(--paper-2);box-shadow:var(--shadow);min-width:120px;
@@ -197,7 +206,7 @@
   .ladder .bar.current{background:var(--orange);transform:scaleY(1.02)}
   .ladder .bar.peak-rung{border-color:var(--orange-deep)}
   .ladder .bar-lbl{font-size:.62rem;font-weight:700;color:var(--ink-soft);font-variant-numeric:tabular-nums}
-  .ladder .bar-wrap.current .bar-lbl{color:var(--orange-deep);font-weight:800}
+  .ladder .bar-wrap.current .bar-lbl{color:var(--orange-ink);font-weight:800}
   @media(max-width:640px){.ladder{height:110px}.ladder .bar-lbl{display:none}}
 
   .transport{display:flex;gap:14px;justify-content:center;margin-top:22px;flex-wrap:wrap}
@@ -211,7 +220,7 @@
   .done-hero h2{border:none;font-size:1.8rem;color:var(--ink);text-transform:none;letter-spacing:0;font-family:var(--serif);margin:6px 0}
   .done-summary{text-align:center;color:var(--ink-soft);font-size:1.05rem;margin:6px 0 4px;font-variant-numeric:tabular-nums}
 
-  footer.foot{margin-top:26px;text-align:center;color:var(--ink-faint);font-size:.76rem;line-height:1.5}
+  footer.foot{margin-top:26px;text-align:center;color:var(--ink-soft);font-size:.76rem;line-height:1.5}
   footer.foot a{color:var(--ink-soft)}
   .foot-links{display:flex;justify-content:center;gap:8px;margin:14px 0 4px;flex-wrap:wrap}
   footer.foot a.foot-btn{display:inline-flex;align-items:center;gap:6px;text-decoration:none;background:var(--paper-2);color:var(--ink);border:1.5px solid var(--stone);border-radius:6px;padding:6px 13px;font-size:.78rem;font-weight:700;font-family:var(--serif);transition:all .1s ease}
@@ -411,7 +420,7 @@
    if this script fails, the plain mailto links still work. */
 (function () {
   // Update this ISO date whenever the shipped app changes.
-  var build = (window.__BUILD__ && String(window.__BUILD__)) || "2026-08-01.3";
+  var build = (window.__BUILD__ && String(window.__BUILD__)) || "2026-08-01.4";
 
   var footer = document.querySelector("footer");
   if (footer && build && !footer.querySelector(".build-stamp")) {
