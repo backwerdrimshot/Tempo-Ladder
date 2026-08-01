@@ -27,10 +27,40 @@ for (const file of files) {
 
 const workers = workflows.get("workers.yml");
 assert.ok(workers, "workers.yml must exist");
+/* Production deploys used to be `workflow_dispatch`-only, and this assertion is
+   what held that line. The rule it protected was "never publish a build nobody
+   validated" — but what it enforced was "never publish without a remembered
+   button-press", and on 2026-08-01 the button was not pressed: this app merged
+   2026-08-01.4 and served .3 for over an hour with every check green.
+
+   The rule survives; the ceremony does not. A deploy is now chained to the CI
+   run, so the only thing that can reach production is a commit "Validate static
+   site" already passed. Each half is asserted below, because dropping any one
+   of them quietly restores a way to publish something unvalidated. */
 assert.deepEqual(
   Object.keys(workers.workflow.on),
-  ["workflow_dispatch"],
-  "Workers production deployment must be manual only",
+  ["workflow_run", "workflow_dispatch"],
+  "Workers production deployment must chain off CI, plus a manual escape hatch",
+);
+assert.deepEqual(
+  workers.workflow.on.workflow_run.workflows,
+  ["Validate static site"],
+  "the Workers deploy must chain off the CI workflow by name",
+);
+assert.deepEqual(
+  workers.workflow.on.workflow_run.branches,
+  ["main"],
+  "only main may deploy to production",
+);
+assert.match(
+  String(workers.workflow.jobs.deploy.if),
+  /workflow_run\.conclusion == 'success'/,
+  "the Workers deploy must refuse to publish a failed or cancelled CI run",
+);
+assert.match(
+  workers.source,
+  /ref:\s*\$\{\{\s*github\.event\.workflow_run\.head_sha/,
+  "the Workers deploy must check out the commit CI validated, not the branch tip",
 );
 assert.equal(
   workers.workflow.jobs.deploy.environment,

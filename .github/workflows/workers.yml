@@ -1,6 +1,24 @@
 name: Deploy to Cloudflare Workers
 
+# A merge to main publishes — but only a commit that CI has already passed.
+#
+# This was workflow_dispatch-only, and the reasoning was sound: production
+# should never receive a build nobody validated. What it actually bought was a
+# remembered button-press, and on 2026-08-01 the button was not pressed. This
+# app merged 2026-08-01.4 and served .3 for over an hour, with every check in
+# the repository green, because they all read the repository. Its sibling was
+# in the identical state. Neither was noticed until the build identifier was
+# read back off the live origin.
+#
+# Chaining to the CI run keeps the guarantee and drops the ceremony: nothing
+# reaches production unless "Validate static site" went green on that exact
+# commit, and the checkout below pins that commit rather than whatever main
+# happens to be by the time this runs.
 on:
+  workflow_run:
+    workflows: ["Validate static site"]
+    types: [completed]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -12,11 +30,18 @@ concurrency:
 
 jobs:
   deploy:
+    # A failed or cancelled CI run must not publish. A manual dispatch is an
+    # explicit human decision and carries no workflow_run to inspect.
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     environment: cloudflare-workers-production
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Deploy the commit CI validated. On workflow_run the default is the
+          # branch tip, which can already have moved past it.
+          ref: ${{ github.event.workflow_run.head_sha || github.ref }}
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
         with:

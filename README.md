@@ -177,10 +177,19 @@ Worker script, API, database, authentication, or server-side application code.
   `2026-07-26`, and serves `./dist` with normal 404 handling.
 - `pnpm deploy:dry-run` validates the deployment bundle without uploading it.
 - `pnpm deploy` builds and deploys the Worker.
-- The manually triggered **Deploy to Cloudflare Workers** workflow performs the same
-  validated production deployment. Configure its
-  `cloudflare-workers-production` environment with `CLOUDFLARE_API_TOKEN` and
-  `CLOUDFLARE_ACCOUNT_ID` secrets.
+- The **Deploy to Cloudflare Workers** workflow performs the same validated
+  production deployment. It runs automatically once **Validate static site**
+  passes on `main`, deploying the exact commit CI checked, and can also be
+  dispatched by hand. A failed or cancelled CI run does not publish. Configure
+  its `cloudflare-workers-production` environment with `CLOUDFLARE_API_TOKEN`
+  and `CLOUDFLARE_ACCOUNT_ID` secrets.
+
+  This was manual-only until 2026-08-01, to keep unvalidated builds out of
+  production. It did not do that — it required somebody to remember, and on
+  2026-08-01 nobody did: `main` carried build `2026-08-01.4` while the origin
+  served `.3` for over an hour, with every check in this repository green,
+  because they all read this repository. Chaining the deploy to the CI run keeps
+  the guarantee without depending on memory.
 
 The existing GitHub Pages deployment remains active as a fallback and publishes the
 same allowlisted site plus `CNAME` from `main`. The committed `CNAME` continues to
