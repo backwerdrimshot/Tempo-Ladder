@@ -203,6 +203,15 @@ like a successful one for over an hour. A spare deploy path that cannot serve
 traffic is not a fallback; it is a second thing that can look like it
 published. `scripts/validate-workflows.mjs` asserts it does not come back.
 
+**Which of the two the custom domain actually resolves to is a DNS and dashboard
+fact, and it is not visible from this repository.** Nothing in git records it, so
+do not infer it from the files here — two publishers both reporting success tell
+you nothing about which one a visitor reaches. To find out what is really being
+served, read the build stamp in the live footer and compare it against the
+`var build` value in `index.html` on `main`; they agree only if the live origin
+is current. That comparison is what caught the `.3`/`.4` gap above, and it is the
+only check here that reads production rather than this repository.
+
 ## Support and feedback
 
 - **Report a problem** emails `support@backwerdrhythmshop.com`.
@@ -233,4 +242,4 @@ These three links also appear as icon buttons in the app footer.
 
 ## Ownership
 
-© Backwerd Rimshot, LLC
+© 2026 Backwerd Rimshot, LLC. All rights reserved.
