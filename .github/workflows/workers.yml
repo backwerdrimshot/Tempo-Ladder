@@ -1,6 +1,15 @@
 name: Deploy to Cloudflare Workers
 
+# A merge to main publishes. Until 2026-08-01 this workflow was
+# workflow_dispatch-only, so merging changed nothing on the live origin unless
+# somebody remembered to come back and press the button — and the sibling
+# pages.yml *did* run on push, which made every merge look like it had
+# deployed. Both this app and its sibling sat a release behind main for hours
+# with every check green, and it was only caught by reading the build
+# identifier back off the origin.
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
