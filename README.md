@@ -16,7 +16,7 @@ Sibling app to [Pulse Pocket Metronome](https://pulse.backwerdrhythmshop.com/),
 - **Build:** `2026-07-26.2`
 - **Status:** Live
 - **Live app:** <https://tempoladder.backwerdrhythmshop.com/>
-- **Public app guide:** <https://www.backwerdrhythmshop.com/app-guides/tempo-ladder>
+- **Public app guide:** <https://backwerdrhythmshop.com/app-guides/tempo-ladder>
 - **Repository:** <https://github.com/backwerdrimshot/Tempo-Ladder>
 
 Build identifiers use ISO `YYYY-MM-DD`, based on the date the shipped app update
