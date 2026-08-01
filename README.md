@@ -191,10 +191,17 @@ Worker script, API, database, authentication, or server-side application code.
   because they all read this repository. Chaining the deploy to the CI run keeps
   the guarantee without depending on memory.
 
-The existing GitHub Pages deployment remains active as a fallback and publishes the
-same allowlisted site plus `CNAME` from `main`. The committed `CNAME` continues to
-document and preserve `tempoladder.backwerdrhythmshop.com`; it is intentionally not
-included in Workers production assets.
+There is one deploy path. The GitHub Pages workflow and the committed `CNAME`
+were removed on 2026-08-01: Pages published a complete second copy of this app
+on every merge, and the `CNAME` claimed `tempoladder.backwerdrhythmshop.com` —
+the hostname the Worker Custom Domain already serves. DNS routes that name to
+Cloudflare, so the Pages copy was never reachable.
+
+It was not merely redundant. Its "Deploy to GitHub Pages" run went green on
+every merge, which is precisely what made a *missing* production deploy look
+like a successful one for over an hour. A spare deploy path that cannot serve
+traffic is not a fallback; it is a second thing that can look like it
+published. `scripts/validate-workflows.mjs` asserts it does not come back.
 
 ## Support and feedback
 

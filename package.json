@@ -6,13 +6,12 @@
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "build": "node scripts/build.mjs",
-    "build:pages": "node scripts/build.mjs --pages",
     "preview": "pnpm build && wrangler dev",
     "lint": "node --check scripts/build.mjs && node --check scripts/dev.mjs && node --check scripts/lint.mjs && node --check scripts/validate-workflows.mjs && node --check tests/site.test.mjs && node --check js/tempoladder-app.js && node --check js/tempoladder-core.js && node --check js/tempoladder-link.js && node scripts/lint.mjs && node scripts/validate-workflows.mjs",
     "test": "node --test",
     "deploy": "pnpm build && wrangler deploy",
     "deploy:dry-run": "pnpm build && wrangler deploy --dry-run --outdir .wrangler/dry-run",
-    "check": "pnpm lint && pnpm test && pnpm build && pnpm build:pages && pnpm deploy:dry-run"
+    "check": "pnpm lint && pnpm test && pnpm build && pnpm deploy:dry-run"
   },
   "devDependencies": {
     "wrangler": "4.114.0",

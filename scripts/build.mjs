@@ -17,8 +17,12 @@ export const SITE_ASSETS = Object.freeze([
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const output = join(root, "dist");
 
-export async function buildSite({ pages = false } = {}) {
-  const assets = pages ? [...SITE_ASSETS, "CNAME"] : SITE_ASSETS;
+/* The `pages` option is gone with the GitHub Pages deploy. It existed only to
+   copy CNAME into dist, and that CNAME claimed the same hostname the Cloudflare
+   Worker already serves — so Pages published a full second copy of this app
+   that DNS never routed to. */
+export async function buildSite() {
+  const assets = SITE_ASSETS;
   await rm(output, { recursive: true, force: true });
   await Promise.all(
     assets.map(async (asset) => {
@@ -27,9 +31,9 @@ export async function buildSite({ pages = false } = {}) {
       await copyFile(join(root, asset), target);
     }),
   );
-  console.log(`Built ${assets.length} static assets in dist${pages ? " for GitHub Pages" : ""}.`);
+  console.log(`Built ${assets.length} static assets in dist.`);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  await buildSite({ pages: process.argv.includes("--pages") });
+  await buildSite();
 }

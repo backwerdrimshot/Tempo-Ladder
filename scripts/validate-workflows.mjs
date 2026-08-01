@@ -70,14 +70,20 @@ assert.equal(
 assert.match(workers.source, /secrets\.CLOUDFLARE_API_TOKEN/);
 assert.match(workers.source, /secrets\.CLOUDFLARE_ACCOUNT_ID/);
 
-const pages = workflows.get("pages.yml");
-assert.ok(pages, "pages.yml must exist");
-assert.match(pages.source, /pnpm build:pages/);
-assert.match(pages.source, /path:\s*dist/);
+/* pages.yml was asserted here, and is gone. GitHub Pages published a complete
+   second copy of this app on every merge, and the CNAME it shipped claimed
+   tempoladder.backwerdrhythmshop.com — the hostname the Cloudflare Worker
+   already serves. DNS routes that name to Cloudflare, so the Pages copy was
+   unreachable, and its green "Deploy" run on every merge is what disguised the
+   deploy that was not happening.
+
+   This asserts it stays gone, because a second deploy path is not a neutral
+   spare: it is a second thing that can look like it published. */
+assert.ok(!workflows.has("pages.yml"), "there is one deploy path; pages.yml must not come back");
 
 const ci = workflows.get("ci.yml");
 assert.ok(ci, "ci.yml must exist");
-for (const command of ["pnpm lint", "pnpm test", "pnpm build", "pnpm build:pages", "pnpm deploy:dry-run"]) {
+for (const command of ["pnpm lint", "pnpm test", "pnpm build", "pnpm deploy:dry-run"]) {
   assert.ok(ci.source.includes(command), `ci.yml must run ${command}`);
 }
 
