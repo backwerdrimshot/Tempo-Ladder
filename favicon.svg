@@ -1,33 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
   <title id="title">Tempo Ladder</title>
-  <desc id="desc">Refreshed app icon for Tempo Ladder</desc>
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0.82" y2="1">
-      <stop offset="0" stop-color="#315766"/>
-      <stop offset="1" stop-color="#102B37"/>
-    </linearGradient>
-    <radialGradient id="glow" cx="0.25" cy="0.06" r="0.95">
-      <stop offset="0" stop-color="#A8C1B5" stop-opacity="0.26"/>
-      <stop offset="0.58" stop-color="#A8C1B5" stop-opacity="0.035"/>
-      <stop offset="1" stop-color="#A8C1B5" stop-opacity="0"/>
-    </radialGradient>
-    <filter id="symbolShadow" x="-25%" y="-25%" width="150%" height="160%">
-      <feDropShadow dx="0" dy="22" stdDeviation="24" flood-color="#050A10" flood-opacity="0.28"/>
-    </filter>
-
-  </defs>
-  <rect width="1024" height="1024" fill="url(#bg)"/>
-  <rect width="1024" height="1024" fill="url(#glow)"/>
-  <circle cx="512" cy="494" r="356" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.035"/>
-  <circle cx="512" cy="494" r="306" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.022"/>
-  <g filter="url(#symbolShadow)">
-
-        <rect x="238" y="574" width="92" height="188" rx="46" fill="#A8C1B5"/>
-        <rect x="370" y="454" width="92" height="308" rx="46" fill="#F6F0E5"/>
-        <rect x="502" y="334" width="92" height="428" rx="46" fill="#FF6B3D"/>
-        <rect x="634" y="454" width="92" height="308" rx="46" fill="#F6F0E5"/>
-        <rect x="766" y="574" width="92" height="188" rx="46" fill="#A8C1B5"/>
-
+  <desc id="desc">A ladder with three rungs, the top one in the accent</desc>
+  <!-- Timing family: Ink ground. An actual ladder rather than rising bars.
+       Rising bars were doing two jobs badly: they read as a generic signal-
+       strength meter, and at 56px they were the icon most easily confused with
+       Scale Trail, which is in a different family and also means "ascending".
+       A ladder is the app's own name and collides with nothing. -->
+  <rect width="1024" height="1024" fill="#171717"/>
+  <g fill="#fafaf9">
+    <rect x="296" y="250" width="72" height="524" rx="36"/>
+    <rect x="656" y="250" width="72" height="524" rx="36"/>
+    <rect x="296" y="638" width="432" height="72" rx="36"/>
+    <rect x="296" y="476" width="432" height="72" rx="36"/>
   </g>
+  <!-- The rung being worked toward. -->
+  <rect x="296" y="314" width="432" height="72" rx="36" fill="#e2725b"/>
 </svg>
