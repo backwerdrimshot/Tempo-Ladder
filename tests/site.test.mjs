@@ -56,13 +56,19 @@ test("production build publishes only the explicit site allowlist", async () => 
   }
 });
 
-test("GitHub Pages compatibility build adds only CNAME", async () => {
+test("the build has no Pages mode, and never emits a CNAME", async () => {
+  /* This asserted the opposite until 2026-08-01: that `--pages` added a CNAME
+     claiming tempoladder.backwerdrhythmshop.com. DNS routes that hostname to
+     the Cloudflare Worker, so the Pages copy it was built for could never serve
+     it — and the green "Deploy to GitHub Pages" run on every merge is what
+     disguised a production deploy that was not happening.
+
+     The flag is passed here deliberately. It is not an error any more, just
+     inert, and an old habit or a stale script must not quietly resurrect a
+     second deploy artifact. */
   await execFileAsync(process.execPath, ["scripts/build.mjs", "--pages"], { cwd: root });
-  assert.deepEqual(await filesBelow(dist), [...SITE_ASSETS, "CNAME"].sort());
-  assert.equal(
-    (await readFile(new URL("CNAME", dist), "utf8")).trim(),
-    "tempoladder.backwerdrhythmshop.com",
-  );
+  assert.deepEqual(await filesBelow(dist), [...SITE_ASSETS].sort());
+  await assert.rejects(stat(new URL("CNAME", dist)), { code: "ENOENT" });
 });
 
 test("PWA metadata and icon files retain their public paths", () => {
