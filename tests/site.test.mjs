@@ -96,7 +96,7 @@ test("PWA metadata and icon files retain their public paths", () => {
 test("legal, guide, support, and social destinations remain intact", () => {
   for (const expected of [
     "© 2026 Backwerd Rimshot, LLC. All rights reserved.",
-    "https://backwerdrhythmshop.com/app-guides/tempo-ladder",
+    "https://guides.backwerdrhythmshop.com/tempo-ladder/",
     'href="https://backwerdrhythmshop.com"',  // the footer wordmark links the shop's front door
 
     "support@backwerdrhythmshop.com",
