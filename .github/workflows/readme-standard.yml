@@ -46,10 +46,10 @@ jobs:
           fi
           grep -Eq '^- \*\*Status:\*\* .+$' README.md || { echo "Missing release status"; exit 1; }
           grep -Eq '^- \*\*Live app:\*\* <https://[^>]+/?>$' README.md || { echo "Missing live app URL"; exit 1; }
-          grep -Eq '^- \*\*Public app guide:\*\* <https://(www\.)?backwerdrhythmshop\.com/app-guides/[^>]+>$' README.md || { echo "Missing public app guide URL"; exit 1; }
+          grep -Eq '^- \*\*Public app guide:\*\* <https://guides\.backwerdrhythmshop\.com/[^>]+>$' README.md || { echo "Missing public app guide URL"; exit 1; }
           grep -Eq '^- \*\*Repository:\*\* <https://github\.com/[^>]+>$' README.md || { echo "Missing repository URL"; exit 1; }
           git grep -F "$build" -- . ':!README.md' ':!.github/**' ':!docs/**' >/dev/null || { echo "Build date is not present in app code"; exit 1; }
-          guide="$(grep -E '^- \*\*Public app guide:\*\* <https://(www\.)?backwerdrhythmshop\.com/app-guides/[^>]+>$' README.md | sed -E 's/.*<([^>]+)>.*/\1/')"
+          guide="$(grep -E '^- \*\*Public app guide:\*\* <https://guides\.backwerdrhythmshop\.com/[^>]+>$' README.md | sed -E 's/.*<([^>]+)>.*/\1/')"
           git grep -F "$guide" -- . ':!README.md' ':!.github/**' ':!docs/**' >/dev/null || { echo "Public app guide is not linked from the app"; exit 1; }
           grep -Fq 'support@backwerdrhythmshop.com' README.md || { echo "Missing support destination"; exit 1; }
           grep -Fq 'feedback@backwerdrhythmshop.com' README.md || { echo "Missing feedback destination"; exit 1; }
