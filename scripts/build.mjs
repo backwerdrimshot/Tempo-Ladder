@@ -4,6 +4,8 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 export const SITE_ASSETS = Object.freeze([
   "index.html",
+  "robots.txt",
+  "sitemap.xml",
   "manifest.webmanifest",
   "favicon.svg",
   "apple-touch-icon.png",
