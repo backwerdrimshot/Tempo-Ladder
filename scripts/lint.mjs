@@ -6,11 +6,13 @@ const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
 const manifest = JSON.parse(await readFile(new URL("../manifest.webmanifest", import.meta.url), "utf8"));
 const wrangler = JSON.parse(await readFile(new URL("../wrangler.jsonc", import.meta.url), "utf8"));
 
-const inlineScriptPattern = /<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi;
-const inlineScripts = [...html.matchAll(inlineScriptPattern)].filter((match) => match[1].trim());
+const inlineScriptPattern = /<script([^>]*)>([\s\S]*?)<\/script>/gi;
+const inlineScripts = [...html.matchAll(inlineScriptPattern)].filter(
+  (match) => match[2].trim() && !/\btype\s*=\s*["\']application\/ld\+json["\']/i.test(match[1]),
+);
 assert.ok(inlineScripts.length > 0, "index.html must contain inline JavaScript");
 inlineScripts.forEach((match, index) =>
-  new vm.Script(match[1], { filename: `index.inline-${index + 1}.js` }),
+  new vm.Script(match[2], { filename: `index.inline-${index + 1}.js` }),
 );
 
 const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map((match) => match[1]);
