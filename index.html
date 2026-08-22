@@ -560,5 +560,18 @@
     .catch(function () {});
 })();
 </script>
+<!-- Cloudflare Web Analytics.
+
+     The shop site's Worker injects this on every page it serves, but it does not
+     serve this host — tempoladder.backwerdrhythmshop.com is its own deployment,
+     so the tag has to live here. Same site token as the rest of
+     backwerdrhythmshop.com, so this app's numbers land beside
+     apps.backwerdrhythmshop.com/tempo-ladder/ rather than in a second dashboard.
+
+     It counts page views: no cookies, no fingerprinting, no way to follow anyone
+     to another site. Remembered settings are untouched — those still stay in
+     local storage and nothing leaves the device, which is what the README says
+     and continues to mean. -->
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "4c76fa6f3023401899bbeb30fa4eebd3"}'></script>
 </body>
 </html>

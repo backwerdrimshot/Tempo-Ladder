@@ -27,7 +27,11 @@ changes. The README and app footer must still agree.
 ## Privacy and accessibility
 
 Tempo Ladder requires no account or backend. Settings stay in the browser's local
-storage. The app supports keyboard controls, visible focus, reduced motion, phone and
+storage. One script does load: a Cloudflare Web Analytics beacon that counts page views
+and nothing else — no cookies, no fingerprinting, no following anyone to another site.
+It carries the same site token as the rest of backwerdrhythmshop.com so this app's
+numbers land beside the page that describes it, and it never sees a climb, a tempo or a
+remembered setting. The shop site's `/privacy/` describes it for visitors. The app supports keyboard controls, visible focus, reduced motion, phone and
 tablet layouts, classroom displays, and a best-effort screen wake lock while playing.
 
 ## Local development
