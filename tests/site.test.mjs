@@ -154,3 +154,39 @@ test("README validation remains useful without forcing app-change build bumps", 
   assert.doesNotMatch(readmeWorkflow, /App changes require a new build identifier/);
   assert.doesNotMatch(prTemplate, /changed if the shipped app changed/);
 });
+
+/* The shop site's Worker injects this beacon in one place for every page it
+   serves, and it does not serve this host. tempoladder.backwerdrhythmshop.com is
+   its own deployment, so nothing upstream notices if the tag goes missing.
+
+   The token is written out literally rather than read from a constant. A
+   wrong-but-present token is the failure that costs most: the beacon loads, the
+   page looks right, nothing errors, and the views land in someone else's
+   dashboard or nowhere at all. Only a literal catches that. */
+const BEACON = /<script[^>]*src="https:\/\/static\.cloudflareinsights\.com\/beacon\.min\.js"[^>]*><\/script>/;
+
+test("the analytics beacon ships, with the shared site token", () => {
+  const tag = html.match(BEACON);
+  assert.ok(tag, "index.html must carry the beacon as a real script element");
+  assert.match(tag[0], /4c76fa6f3023401899bbeb30fa4eebd3/);
+  assert.match(tag[0], /type="module"/, "module scripts defer without blocking the parser");
+});
+
+/* The build copies an explicit allowlist into dist/, so a tag present in the
+   source is not proof of a tag in the shipped page. This is the file a browser
+   actually receives. */
+test("the built page still carries the beacon", async () => {
+  const built = await readFile(new URL("index.html", dist), "utf8");
+  const tag = built.match(BEACON);
+  assert.ok(tag, "dist/index.html must carry the beacon — the build dropped it");
+  assert.match(tag[0], /4c76fa6f3023401899bbeb30fa4eebd3/);
+});
+
+/* The beacon reports pages. It must never become a route for a climb, a tempo or
+   a remembered setting — that is the promise the README's Privacy section makes
+   and the one /privacy/ makes on this app's behalf. */
+test("the analytics beacon carries nothing but its token", () => {
+  const config = html.match(BEACON)[0].match(/data-cf-beacon='([^']*)'/);
+  assert.ok(config, "the beacon must declare a data-cf-beacon config");
+  assert.deepEqual(JSON.parse(config[1]), { token: "4c76fa6f3023401899bbeb30fa4eebd3" });
+});
