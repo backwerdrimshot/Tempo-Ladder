@@ -14,6 +14,15 @@ export const SITE_ASSETS = Object.freeze([
   "js/tempoladder-core.js",
   "js/tempoladder-link.js",
   "js/tempoladder-app.js",
+  /* The brand token file and the self-hosted faces, served so the token file
+     matches the site's byte for byte. */
+  "assets/brand/design-tokens.css",
+  "assets/fonts/big-shoulders-display-800-latin.woff2",
+  "assets/fonts/big-shoulders-display-OFL.txt",
+  "assets/fonts/barlow-condensed-400-latin.woff2",
+  "assets/fonts/barlow-condensed-600-latin.woff2",
+  "assets/fonts/barlow-condensed-700-latin.woff2",
+  "assets/fonts/barlow-condensed-OFL.txt",
 ]);
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");

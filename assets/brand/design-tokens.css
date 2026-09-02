@@ -1,0 +1,163 @@
+/*
+ * Backwerd Rhythm Shop — shared design tokens
+ *
+ * Canonical source: the Backwerd Rimshot Brand Guide, as actually implemented
+ * in this repo's /standards/index.html. Copy this whole file into an app repo
+ * rather than re-typing the values — that's how "Grid Board visual language"
+ * drifted into three unrelated hex sets last time.
+ *
+ * Usage: link or inline this file, then reference the custom properties.
+ * Don't hardcode a hex value from this file directly — reference the
+ * variable, so a future correction here propagates instead of needing a
+ * second hunt-and-replace across twelve repos.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  /* ---- base identity — every app, every category ---- */
+  --warm-white: #fafaf9;   /* page background */
+  --white:      #ffffff;
+  --ink:        #171717;   /* body text and headings */
+  --ink-soft:   #4f4a47;   /* secondary copy, light backgrounds only */
+  --tan:        #d2b48c;   /* panels, cards, selected sections */
+  --tan-line:   #bfa073;
+  --line:       #e2ded6;   /* hairlines, dividers */
+
+  /* ---- brand hues — also the source for the four category accents ---- */
+  --brick:       #8b3a3a;  /* Deep Brick — primary */
+  --brick-deep:  #6d2d2d;
+  --forest:      #567d46;  /* secondary */
+  --forest-deep: #416034;
+  --terra:       #e2725b;  /* limited accent — never normal-sized body text */
+  --stone:       #92a6c1;  /* Stone Blue — a ground/panel hue, not a category accent.
+                              Ink sits on it at 7.21:1; as type on Warm White it is only
+                              2.38:1, so like Terra it is never normal-sized body text. */
+  --stone-line:  #788fae;  /* deeper edge for stone panels, as --tan-line is to --tan */
+  --stone-deep:  #667487;  /* the stone that carries type on light, 4.56:1 */
+
+  /* ---- hue ramps — the variants the poster work kept having to invent by hand.
+     Each one is derived against the surface it is actually for, which is why the set is
+     not symmetric: a dark hue already carries type on light and needs a TINT for type on
+     itself, while a light hue is the reverse. Ratios are against the named surface. ---- */
+  --brick-ground:  #833737;  /* brick as a full-bleed ground — one shade down, so warm-white
+                                body type clears 4.5:1 even under red-green colour blindness
+                                (4.82 simulated, against 4.37 at full --brick) */
+  --brick-tint:    #ddc8c7;  /* type on a brick ground, 4.76:1 on --brick, 5.13:1 on the above */
+  --forest-ground: #405d34;  /* forest as a full-bleed ground — at full --forest, warm-white is
+                                only 4.55:1 and a second level of light type has nowhere to sit */
+  --forest-tint:   #c6d2c0;  /* type on a forest ground, 4.72:1 on --forest-ground. Do not use it
+                                on full --forest: 3.03:1, which is what --forest-ground is for */
+  --terra-line:    #cb5841;  /* deeper edge for terra panels, as --tan-line is to --tan */
+  --terra-deep:    #ac5745;  /* terra that carries type on light, 4.78:1 — full --terra is 2.96:1 */
+
+  /* ---- Sky — the poster colorway ground, a surface pair like tan ----
+   *
+   * Chosen by Taylor for the Sky Blue Theory Reference poster colorway and
+   * confirmed since; --sky is the poster ground, --sky-line its title band.
+   * The pair mirrors --tan / --tan-line exactly, which is the same
+   * ground/band relationship the Kraft colorway uses, so use them the same
+   * way: a panel or section surface, with --ink on top. Not a category
+   * accent, and not a text color.
+   *
+   * Contrast with --ink, measured: 10.29:1 on --sky, 7.25:1 on --sky-line.
+   * Both clear AA comfortably; --sky has the most headroom of any colored
+   * ground in the poster set, and --sky-line sits at exactly the same 7.25:1
+   * as --tan-line.
+   *
+   * Unlike the rest of this file these two are NOT lifted from the Brand
+   * Guide — #87ceeb is a hex Taylor supplied directly, and is deliberately
+   * not a derivative of an existing brand token. Recorded here so nobody
+   * rediscovers that and files it as drift.
+   */
+  --sky:      #87ceeb;
+  --sky-line: #71adc6;
+
+  /* ---- category accents — one per taxonomy group on the live site ---- */
+  --accent-keep-time:              var(--brick);
+  --accent-read-build-rhythm:      var(--forest);
+  --accent-train-your-hands:       var(--terra);
+  --accent-learn-the-instruments:  var(--tan);
+
+  /* ---- type ---- */
+  --display: "Big Shoulders Display", "Barlow Condensed", Oswald, Impact, sans-serif;
+  --body:    "Barlow Condensed", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/*
+ * Dark — already shipping on six site pages (catalog, home, about, contact,
+ * policies, privacy). This is the exact remapping used there: the SAME
+ * variable names take dark-mode values, so app code that reads --ink or
+ * --brick doesn't need a separate dark-mode code path, only this block.
+ *
+ * Trigger is prefers-color-scheme only — no toggle, no JS, no flash of the
+ * light theme before first paint. Every pair below clears WCAG AA against the
+ * surface it actually sits on; see the Brand Guide for the full contrast
+ * table if you introduce a new pairing.
+ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --warm-white: #171717;  /* ground */
+    --white:      #232320;  /* Ink Lifted — cards, panels */
+    --ink:        #fafaf9;  /* body text, 17.17:1 on the ground */
+    --ink-soft:   #bdb6ad;  /* Warm Gray, 8.93:1 */
+    --tan:        #2e2c28;  /* Ink Raised — the one emphasis panel per page */
+    --tan-line:   #3a3733;  /* Ink Line */
+    --line:       #3a3733;
+
+    --brick:       #e2725b; /* Terra Cotta takes Deep Brick's job on dark */
+    --brick-deep:  #8b3a3a; /* survives only as depth, never as text */
+    --forest:      #7ca368; /* Forest Light, 6.23:1 — full Forest is 3.77:1, text-unsafe */
+    --forest-deep: #7ca368; /* on light this darkens Forest for type; on dark it must lighten */
+    --terra:       #e2725b;
+    --stone:       #92a6c1; /* 7.21:1 on the ground — the one hue that carries over unchanged */
+    --stone-line:  #667487; /* recedes to an edge tone here, 3.89:1 */
+    --stone-deep:  #92a6c1; /* as with --forest-deep: darkens type on light, must lighten on dark */
+
+    /* The hue ramps are artwork values — a printed poster ground does not follow the reader's
+       OS theme — so they stay put here, exactly as --terra already does. */
+    --brick-ground:  #833737;
+    --brick-tint:    #ddc8c7;
+    --forest-ground: #405d34;
+    --forest-tint:   #c6d2c0;
+    --terra-line:    #cb5841;
+    --terra-deep:    #ac5745;
+
+    /* Sky is a surface, so it has to darken here for the same reason --tan
+       does. Leaving it at its light value would be an outright trap: --ink
+       becomes #fafaf9 in this block, and #fafaf9 on #87ceeb is 1.67:1.
+       Anyone using --sky as a panel would get white on pale blue.
+
+       Derived rather than quoted: both keep #87ceeb's hue (197°) and
+       saturation and are darkened to land on the SAME contrast stations the
+       tan pair already occupies — 13.34:1 against #fafaf9, matching
+       --tan #2e2c28 to two decimals, and 11.34:1 matching --tan-line
+       #3a3733. Warm Gray --ink-soft reads 6.94:1 on --sky, also identical
+       to its value on --tan.
+
+       Flagged for the Brand Guide: the light pair above is Taylor's, but
+       these two dark values are a derivation and have not been through
+       brand approval. Replace them if the Guide sets its own. */
+    --sky:      #0a303f;
+    --sky-line: #0d3c4e;
+
+    /* Category accents follow the same aliases — no separate dark set to keep in sync. */
+  }
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background: var(--warm-white);
+  font-family: var(--body);
+}
+
+h1, h2, h3 {
+  font-family: var(--display);
+  font-weight: 800;
+}
+
+:focus-visible {
+  outline: 3px solid var(--forest);
+  outline-offset: 3px;
+}

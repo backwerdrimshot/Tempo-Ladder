@@ -4,10 +4,16 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="description" content="Build speed and control with a guided slow–fast–slow tempo path in Tempo Ladder, a free browser-based practice app for percussionists." />
-<meta name="theme-color" content="#142a36" />
+<meta name="theme-color" content="#171717" />
 <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
 <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
 <link rel="manifest" href="./manifest.webmanifest" />
+<!-- The Backwerd Rhythm Shop token file, copied verbatim from
+     assets/brand/design-tokens.css in backwerd-rhythm-shop-site (its own
+     instruction is to copy the whole file, never retype values). Linked ahead
+     of the inline stylesheet so every colour below resolves from it, in light
+     and, under prefers-color-scheme, dark. -->
+<link rel="stylesheet" href="./assets/brand/design-tokens.css" />
 <link rel="canonical" href="https://tempoladder.backwerdrhythmshop.com/" />
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Tempo Ladder","url":"https://tempoladder.backwerdrhythmshop.com/","applicationCategory":"EducationalApplication","applicationSubCategory":"Music education","operatingSystem":"Any device with a modern web browser","isAccessibleForFree":true,"description":"Build speed and control with a guided slow–fast–slow tempo path in Tempo Ladder, a free browser-based practice app for percussionists.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"Backwerd Rhythm Shop","url":"https://backwerdrhythmshop.com/"}}</script>
 <meta property="og:type" content="website" />
@@ -22,42 +28,50 @@
 <meta name="twitter:description" content="A symmetric slow-fast-slow tempo trainer for percussionists, from Backwerd Rhythm Shop." />
 <title>Tempo Ladder Practice App | Build Speed Gradually</title>
 <style>
-  /* Tempo Ladder — Grid Board visual language:
-     navy ink · warm cream paper · burnt-orange energy · sage selections. */
+  /* Tempo Ladder — Backwerd Rhythm Shop base identity + the Keep Time
+     category accent (Deep Brick), per the Suite Visual Unification decisions
+     of 2026-08. Until this build the file carried the invented "Grid Board
+     visual language" (navy ink, warm cream, burnt orange, sage) that the
+     August audit found matched neither the Rhythm Shop nor Praxis; its
+     August rebrand never reached main, so this pass does the whole job at
+     once. Every hue comes from the linked design-tokens.css; the block below
+     holds only this app's category alias, a pressed shade and the on-Ink type
+     pair. The same names take dark values under prefers-color-scheme, so
+     nothing here needs a second path. The letterpress furniture — 2px Ink
+     rules and hard offset shadows with no blur — is the app's own and stays. */
+
+  /* The brand faces, self-hosted from ./assets/fonts. No font service is
+     contacted. Licensed OFL 1.1 — see the OFL texts beside the files. */
+  @font-face{font-family:"Big Shoulders Display";font-style:normal;font-weight:800;font-display:swap;src:url("./assets/fonts/big-shoulders-display-800-latin.woff2") format("woff2")}
+  @font-face{font-family:"Barlow Condensed";font-style:normal;font-weight:400;font-display:swap;src:url("./assets/fonts/barlow-condensed-400-latin.woff2") format("woff2")}
+  @font-face{font-family:"Barlow Condensed";font-style:normal;font-weight:600;font-display:swap;src:url("./assets/fonts/barlow-condensed-600-latin.woff2") format("woff2")}
+  @font-face{font-family:"Barlow Condensed";font-style:normal;font-weight:700;font-display:swap;src:url("./assets/fonts/barlow-condensed-700-latin.woff2") format("woff2")}
+
   :root{
-    --paper:#f8e9d8;        /* warm cream page */
-    --paper-2:#fffdf8;      /* raised cream / panels */
-    --card:#fbf7ef;         /* panel paper */
-    --ink:#142a36;          /* deep navy ink */
-    /* One notch deeper than the #58707b this used to be: on the cream page
-       wash that was 4.25:1, and the tagline and the brand line sit on it. */
-    --ink-soft:#4f6873;     /* steel-blue muted text */
-    /* There is no third text tier. --ink-faint was #8ca1aa and both uses of it
-       were text — the footer and the preview arrow — at 2.19:1 and 2.52:1. It
-       could not be darkened to the 4.5:1 floor without landing on top of
-       --ink-soft, because warm paper has room for two readable tiers under
-       --ink and not three, so the tier is gone and both read as --ink-soft.
-       If something needs to recede, use size, weight, or space; do not reach
-       for a lighter ink. */
-    --orange:#f36f3d;       /* burnt orange */
-    --orange-deep:#c94b20;  /* orange as a FILL, under paper-coloured type */
-    --orange-ink:#ad3d0d;   /* orange as TEXT, on paper — --orange-deep is 3.91:1 there */
-    --sage:#cfe1d4;         /* muted sage — selected states */
-    --sage-deep:#a9d8c0;
-    --stone:#d8d0c3;        /* soft stone borders */
-    --cyan:#58a6c3;
-    --good:#1d6b3c;
-    --serif:'Palatino Linotype',Palatino,'Iowan Old Style',Georgia,serif;
+    --accent:var(--accent-keep-time);
+    /* A pressed shade under Deep Brick for the Start button's hover. */
+    --brick-press:#6d2d2d;
+    /* Type on an Ink surface (the pressed segment, the Play button). The
+       surface is var(--ink), which flips with the scheme, so this flips the
+       other way to stay legible on it. */
+    --on-ink:var(--warm-white);
     --radius:12px;
-    --shadow:5px 5px 0 rgba(20,42,54,.14);
+    --shadow:5px 5px 0 rgba(0,0,0,.14);
     font-synthesis:none;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --brick-press:#8b3a3a;
+      --shadow:5px 5px 0 rgba(0,0,0,.45);
+    }
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
   body{
-    background:linear-gradient(180deg,#faf0e0,#f4e6d1);
+    background:var(--warm-white);
     color:var(--ink);
-    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    font-family:var(--body);
+    font-size:1.06rem;
     min-height:100vh;
     padding:26px 16px 56px;
   }
@@ -74,20 +88,20 @@
     display:block;box-shadow:3px 3px 0 var(--ink);
   }
   .logo img{width:100%;height:100%;display:block;object-fit:cover}
-  .brand h1{margin:0;font-size:1.7rem;letter-spacing:.2px;font-family:var(--serif)}
-  .brand h1 span{color:var(--orange-deep)}
+  .brand h1{margin:0;font-size:1.9rem;letter-spacing:.02em;text-transform:uppercase;font-family:var(--display);font-weight:800}
+  .brand h1 span{color:var(--brick-deep)}
   .brand p{margin:3px 0 0;color:var(--ink-soft);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;font-weight:700}
   .brand .fs{margin-left:auto}
 
   .panel{
-    background:var(--card);border:2px solid var(--ink);border-radius:var(--radius);
+    background:var(--white);border:2px solid var(--ink);border-radius:var(--radius);
     padding:20px;box-shadow:var(--shadow);
   }
   .panel + .panel{margin-top:18px}
   .panel h2{
     margin:0 0 16px;font-size:.72rem;text-transform:uppercase;letter-spacing:.18em;
     color:var(--ink-soft);font-weight:800;
-    border-bottom:1px solid var(--stone);padding-bottom:9px;
+    border-bottom:1px solid var(--tan-line);padding-bottom:9px;
   }
   .hint{color:var(--ink-soft);font-size:.85rem;margin:2px 0 0}
 
@@ -101,48 +115,48 @@
   #exerciseLabel{
     width:100%;font-family:inherit;font-size:1rem;font-weight:700;
     padding:9px 11px;border:2px solid var(--ink);border-radius:8px;
-    background:var(--paper-2);color:var(--ink);
+    background:var(--white);color:var(--ink);
   }
   /* What the student is playing while the ladder runs. Text only — it can
      arrive from a link someone else wrote. */
   .exercise-label{
-    margin:0 0 10px;text-align:center;font-family:var(--serif);font-style:italic;
-    font-size:clamp(1.05rem,2.4vw,1.5rem);color:var(--orange-ink);
+    margin:0 0 10px;text-align:center;font-weight:600;
+    font-size:clamp(1.1rem,2.4vw,1.55rem);color:var(--brick-deep);
     overflow-wrap:anywhere;
   }
   .num-row{display:flex;align-items:stretch;gap:8px}
   .num-row input[type=number]{
     flex:1;min-width:0;font-family:inherit;font-size:1.4rem;font-weight:800;
     text-align:center;padding:8px 6px;border:2px solid var(--ink);border-radius:8px;
-    background:var(--paper-2);color:var(--ink);font-variant-numeric:tabular-nums;
+    background:var(--white);color:var(--ink);font-variant-numeric:tabular-nums;
     -moz-appearance:textfield;
   }
   .num-row input[type=number]::-webkit-outer-spin-button,
   .num-row input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
   button.step{
     width:44px;flex:0 0 auto;font-size:1.3rem;font-weight:800;cursor:pointer;
-    background:var(--paper-2);color:var(--ink);border:2px solid var(--ink);border-radius:8px;
+    background:var(--white);color:var(--ink);border:2px solid var(--ink);border-radius:8px;
     box-shadow:2px 2px 0 var(--ink);transition:transform .06s ease,box-shadow .06s ease;
   }
-  button.step:hover{background:var(--sage)}
+  button.step:hover{background:var(--tan)}
   button.step:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--ink)}
 
   /* Segmented controls (measures + mode) */
   .seg{display:flex;gap:0;border:2px solid var(--ink);border-radius:9px;overflow:hidden;box-shadow:2px 2px 0 var(--ink)}
   .seg button{
     flex:1;padding:11px 8px;font-family:inherit;font-size:.95rem;font-weight:800;cursor:pointer;
-    background:var(--paper-2);color:var(--ink);border:none;border-right:2px solid var(--ink);
+    background:var(--white);color:var(--ink);border:none;border-right:2px solid var(--ink);
     transition:background .12s ease;
   }
   .seg button:last-child{border-right:none}
-  .seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper-2)}
-  .seg button:hover:not([aria-pressed="true"]){background:var(--sage)}
+  .seg button[aria-pressed="true"]{background:var(--ink);color:var(--on-ink)}
+  .seg button:hover:not([aria-pressed="true"]){background:var(--tan)}
 
   /* Ladder preview + Start */
   .preview{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;margin-top:4px;font-variant-numeric:tabular-nums}
   .preview .rung{font-weight:800;font-size:1.05rem}
   .preview .arrow{color:var(--ink-soft)}
-  .preview .peak{color:var(--orange-ink)}
+  .preview .peak{color:var(--brick-deep)}
   .meta{color:var(--ink-soft);font-size:.9rem;margin-top:10px}
   .start-row{display:flex;gap:14px;align-items:center;margin-top:18px;flex-wrap:wrap}
   .btn{
@@ -151,46 +165,46 @@
   }
   .btn:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
   .btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:2px 2px 0 var(--ink)}
-  .btn.primary{background:var(--orange-deep);color:var(--paper-2);font-size:1.05rem;padding:14px 30px;text-transform:uppercase;letter-spacing:.06em}
-  .btn.primary:hover:not(:disabled){background:var(--orange-deep)}
-  .btn.ghost{background:var(--paper-2);color:var(--ink);padding:12px 22px;font-size:.95rem}
-  .btn.ghost:hover:not(:disabled){background:var(--sage)}
-  .err{color:var(--orange-ink);font-weight:700;font-size:.9rem}
+  .btn.primary{background:var(--accent);color:var(--warm-white);font-size:1.05rem;padding:14px 30px;text-transform:uppercase;letter-spacing:.06em}
+  .btn.primary:hover:not(:disabled){background:var(--brick-press)}
+  .btn.ghost{background:var(--white);color:var(--ink);padding:12px 22px;font-size:.95rem}
+  .btn.ghost:hover:not(:disabled){background:var(--tan)}
+  .err{color:var(--brick-deep);font-weight:700;font-size:.9rem}
 
   /* ---------------- Session screen ---------------- */
   #screenSession[hidden],#screenSetup[hidden],#screenDone[hidden]{display:none}
   .session-top{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center}
   @media(max-width:640px){.session-top{grid-template-columns:1fr;text-align:center}}
   .bpm-block{display:flex;flex-direction:column;gap:2px}
-  .bpm-huge{font-size:clamp(4rem,16vw,9rem);font-weight:800;line-height:.9;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
-  .bpm-huge small{font-size:.22em;color:var(--ink-soft);font-weight:800;letter-spacing:.1em;vertical-align:.7em;margin-left:.15em}
-  .dir-word{font-family:var(--serif);font-style:italic;font-size:clamp(1.3rem,4vw,2.1rem);color:var(--ink-soft)}
-  .dir-word.peak{color:var(--orange-ink);font-style:normal;font-weight:800;text-transform:uppercase;letter-spacing:.04em;font-family:inherit}
+  .bpm-huge{font-size:clamp(4.6rem,18vw,10.5rem);font-weight:800;line-height:.9;font-variant-numeric:tabular-nums;letter-spacing:0;font-family:var(--display)}
+  .bpm-huge small{font-size:.2em;color:var(--ink-soft);font-weight:800;letter-spacing:.1em;vertical-align:.7em;margin-left:.15em;font-family:var(--body)}
+  .dir-word{font-weight:600;font-size:clamp(1.4rem,4vw,2.2rem);color:var(--ink-soft)}
+  .dir-word.peak{color:var(--brick-deep);font-weight:800;text-transform:uppercase;letter-spacing:.04em;font-family:var(--display)}
   .next-chip{
     justify-self:end;text-align:center;border:2px solid var(--ink);border-radius:12px;
-    padding:12px 20px;background:var(--paper-2);box-shadow:var(--shadow);min-width:120px;
+    padding:12px 20px;background:var(--white);box-shadow:var(--shadow);min-width:120px;
   }
   @media(max-width:640px){.next-chip{justify-self:center}}
   .next-chip .lbl{font-size:.66rem;text-transform:uppercase;letter-spacing:.16em;color:var(--ink-soft);font-weight:800}
-  .next-chip .val{font-size:2.2rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+  .next-chip .val{font-size:2.6rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1;font-family:var(--display)}
   .next-chip .val small{font-size:.9rem;color:var(--ink-soft)}
 
   /* Beat dots */
   .beats{display:flex;gap:12px;justify-content:center;margin:22px 0 6px}
-  .beat-dot{width:24px;height:24px;border-radius:50%;border:2px solid var(--ink);background:var(--paper-2);transition:background .05s linear,transform .05s linear}
-  .beat-dot.on{background:var(--cyan)}
+  .beat-dot{width:24px;height:24px;border-radius:50%;border:2px solid var(--ink);background:var(--white);transition:background .05s linear,transform .05s linear}
+  .beat-dot.on{background:var(--forest)}
   .beat-dot.one{border-width:3px}
-  .beat-dot.one.on{background:var(--orange)}
+  .beat-dot.one.on{background:var(--accent)}
 
   /* Banner (Listen / warning / count-in) */
   .banner{
     margin:14px 0 4px;padding:13px 18px;border-radius:10px;border:2px solid var(--ink);
     font-weight:800;text-align:center;font-size:1.05rem;min-height:1.2em;
-    background:var(--paper-2);color:var(--ink);box-shadow:2px 2px 0 var(--ink);
+    background:var(--white);color:var(--ink);box-shadow:2px 2px 0 var(--ink);
   }
-  .banner.listen{background:var(--orange-deep);color:var(--paper-2)}
-  .banner.warn{background:var(--sage-deep);color:var(--ink)}
-  .banner.countin{background:var(--sage);color:var(--ink)}
+  .banner.listen{background:var(--accent);color:var(--warm-white)}
+  .banner.warn{background:var(--tan);color:var(--ink)}
+  .banner.countin{background:var(--tan-soft);color:var(--ink)}
   .banner.hidden{visibility:hidden}
 
   .status-line{text-align:center;color:var(--ink-soft);font-size:1rem;margin:10px 0 4px;font-variant-numeric:tabular-nums}
@@ -201,30 +215,30 @@
   .ladder .bar-wrap{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:5px;height:100%;justify-content:flex-end}
   .ladder .bar{
     width:100%;border:2px solid var(--ink);border-radius:5px 5px 3px 3px;
-    background:var(--paper-2);transition:background .2s ease,transform .12s ease;
+    background:var(--white);transition:background .2s ease,transform .12s ease;
   }
-  .ladder .bar.done{background:var(--sage-deep)}
-  .ladder .bar.current{background:var(--orange);transform:scaleY(1.02)}
-  .ladder .bar.peak-rung{border-color:var(--orange-deep)}
+  .ladder .bar.done{background:var(--forest)}
+  .ladder .bar.current{background:var(--accent);transform:scaleY(1.02)}
+  .ladder .bar.peak-rung{border-color:var(--brick-deep)}
   .ladder .bar-lbl{font-size:.62rem;font-weight:700;color:var(--ink-soft);font-variant-numeric:tabular-nums}
-  .ladder .bar-wrap.current .bar-lbl{color:var(--orange-ink);font-weight:800}
+  .ladder .bar-wrap.current .bar-lbl{color:var(--brick-deep);font-weight:800}
   @media(max-width:640px){.ladder{height:110px}.ladder .bar-lbl{display:none}}
 
   .transport{display:flex;gap:14px;justify-content:center;margin-top:22px;flex-wrap:wrap}
   .btn.big{font-size:1.05rem;padding:15px 34px;min-width:150px}
-  .btn.play{background:var(--ink);color:var(--paper-2)}
-  .btn.play:hover:not(:disabled){background:#0d1e28}
+  .btn.play{background:var(--ink);color:var(--on-ink)}
+  .btn.play:hover:not(:disabled){filter:brightness(1.15)}
 
   /* Completion */
   .done-hero{text-align:center;padding:14px 0 6px}
   .done-hero .mark{font-size:3.4rem}
-  .done-hero h2{border:none;font-size:1.8rem;color:var(--ink);text-transform:none;letter-spacing:0;font-family:var(--serif);margin:6px 0}
+  .done-hero h2{border:none;font-size:2.4rem;color:var(--ink);text-transform:uppercase;letter-spacing:.02em;font-family:var(--display);margin:6px 0}
   .done-summary{text-align:center;color:var(--ink-soft);font-size:1.05rem;margin:6px 0 4px;font-variant-numeric:tabular-nums}
 
   footer.foot{margin-top:26px;text-align:center;color:var(--ink-soft);font-size:.76rem;line-height:1.5}
   footer.foot a{color:var(--ink-soft)}
   .foot-links{display:flex;justify-content:center;gap:8px;margin:14px 0 4px;flex-wrap:wrap}
-  footer.foot a.foot-btn{display:inline-flex;align-items:center;gap:6px;text-decoration:none;background:var(--paper-2);color:var(--ink);border:1.5px solid var(--stone);border-radius:6px;padding:6px 13px;font-size:.78rem;font-weight:700;font-family:var(--serif);transition:all .1s ease}
+  footer.foot a.foot-btn{display:inline-flex;align-items:center;gap:6px;text-decoration:none;background:var(--white);color:var(--ink);border:1.5px solid var(--tan-line);border-radius:6px;padding:6px 13px;font-size:.85rem;font-weight:700;transition:all .1s ease}
   footer.foot a.foot-btn:hover{border-color:var(--ink);box-shadow:2px 2px 0 var(--ink)}
   footer.foot a.foot-btn.foot-ico{padding:8px;border-radius:50%;gap:0;line-height:0}
   footer.foot a.foot-btn.foot-ico svg{width:16px;height:16px;display:block}
@@ -234,28 +248,28 @@
      mailto stays one click away and the message can be copied anywhere. */
   .support-dialog{
     width:min(560px,calc(100vw - 32px));border:2px solid var(--ink);border-radius:12px;
-    padding:20px;background:var(--paper-2);color:var(--ink);box-shadow:var(--shadow)
+    padding:20px;background:var(--white);color:var(--ink);box-shadow:var(--shadow)
   }
-  .support-dialog::backdrop{background:rgba(20,42,54,.45)}
-  .support-dialog h2{margin:0 0 8px;font-size:1.05rem}
+  .support-dialog::backdrop{background:rgba(0,0,0,.45)}
+  .support-dialog h2{margin:0 0 8px;font-size:1.3rem;font-family:var(--display);text-transform:uppercase;letter-spacing:.02em}
   .support-dialog .support-dialog-lede,
   .support-dialog .support-dialog-hint{margin:0 0 12px;color:var(--ink-soft);font-size:.85rem}
   .support-dialog .support-dialog-hint{margin:12px 0 0}
   .support-dialog .support-dialog-label{display:block;font-size:.78rem;font-weight:700}
   .support-dialog textarea{
-    display:block;width:100%;margin-top:6px;padding:10px;border:1.5px solid var(--stone);
-    border-radius:8px;background:var(--paper);color:var(--ink);font:inherit;font-size:.85rem;resize:vertical
+    display:block;width:100%;margin-top:6px;padding:10px;border:1.5px solid var(--tan-line);
+    border-radius:8px;background:var(--warm-white);color:var(--ink);font:inherit;font-size:.85rem;resize:vertical
   }
-  .support-dialog textarea:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
+  .support-dialog textarea:focus-visible{outline:3px solid var(--forest);outline-offset:3px}
   .support-dialog .support-dialog-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
   .support-dialog .foot-btn{
-    display:inline-flex;align-items:center;gap:6px;text-decoration:none;background:var(--paper-2);
-    color:var(--ink);border:1.5px solid var(--stone);border-radius:6px;padding:6px 13px;
-    font-size:.78rem;font-weight:700;font-family:var(--serif);transition:all .1s ease;cursor:pointer
+    display:inline-flex;align-items:center;gap:6px;text-decoration:none;background:var(--white);
+    color:var(--ink);border:1.5px solid var(--tan-line);border-radius:6px;padding:6px 13px;
+    font-size:.85rem;font-weight:700;transition:all .1s ease;cursor:pointer
   }
   .support-dialog .foot-btn:hover{border-color:var(--ink);box-shadow:2px 2px 0 var(--ink)}
 
-  :focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+  :focus-visible{outline:3px solid var(--forest);outline-offset:2px}
 
   /* Fullscreen presentation */
   body:fullscreen,body:-webkit-full-screen{padding-top:20px}
@@ -421,7 +435,7 @@
    if this script fails, the plain mailto links still work. */
 (function () {
   // Update this ISO date whenever the shipped app changes.
-  var build = (window.__BUILD__ && String(window.__BUILD__)) || "2026-09-02";
+  var build = (window.__BUILD__ && String(window.__BUILD__)) || "2026-09-02.2";
 
   var footer = document.querySelector("footer");
   if (footer && build && !footer.querySelector(".build-stamp")) {
