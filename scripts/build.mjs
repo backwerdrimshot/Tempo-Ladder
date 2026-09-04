@@ -1,6 +1,7 @@
-import { copyFile, mkdir, rm } from "node:fs/promises";
+import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { buildStamp, capabilities } from "./capabilities.mjs";
 
 export const SITE_ASSETS = Object.freeze([
   "index.html",
@@ -25,6 +26,12 @@ export const SITE_ASSETS = Object.freeze([
   "assets/fonts/barlow-condensed-OFL.txt",
 ]);
 
+/* Written by the build rather than copied from the tree, and therefore not in
+   SITE_ASSETS — but still published, so it is declared here and the allowlist
+   test stays exhaustive. A generated file that no list names is how an
+   artifact quietly grows. */
+export const GENERATED_ASSETS = Object.freeze(["capabilities.json"]);
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const output = join(root, "dist");
 
@@ -42,7 +49,20 @@ export async function buildSite() {
       await copyFile(join(root, asset), target);
     }),
   );
-  console.log(`Built ${assets.length} static assets in dist.`);
+  /* The capability manifest is GENERATED, never committed, and its version is
+     read out of index.html rather than typed here. A committed manifest would
+     be a third copy of the build identifier that README.md and the page
+     already carry between them; a generated one cannot disagree with the page
+     it came from. It is not in SITE_ASSETS because nothing in the app
+     references it — it is fetched by the shop site's guide-build audit, which
+     cannot check an app that publishes no version. */
+  const stamp = buildStamp(await readFile(join(root, "index.html"), "utf8"));
+  await writeFile(
+    join(output, "capabilities.json"),
+    JSON.stringify(capabilities(stamp), null, 2) + "\n",
+  );
+
+  console.log(`Built ${assets.length} static assets in dist, and capabilities.json for build ${stamp}.`);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

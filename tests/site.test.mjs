@@ -4,7 +4,8 @@ import { readdir, readFile, stat } from "node:fs/promises";
 import { promisify } from "node:util";
 import test from "node:test";
 
-import { SITE_ASSETS } from "../scripts/build.mjs";
+import { GENERATED_ASSETS, SITE_ASSETS } from "../scripts/build.mjs";
+import { buildStamp, capabilities } from "../scripts/capabilities.mjs";
 
 const execFileAsync = promisify(execFile);
 const root = new URL("../", import.meta.url);
@@ -34,7 +35,7 @@ const prTemplate = await readFile(new URL("../.github/pull_request_template.md",
 const wrangler = JSON.parse(await readFile(new URL("../wrangler.jsonc", import.meta.url), "utf8"));
 
 test("production build publishes only the explicit site allowlist", async () => {
-  assert.deepEqual(await filesBelow(dist), [...SITE_ASSETS].sort());
+  assert.deepEqual(await filesBelow(dist), [...SITE_ASSETS, ...GENERATED_ASSETS].sort());
   for (const asset of SITE_ASSETS) {
     assert.deepEqual(
       await readFile(new URL(asset, dist)),
@@ -67,7 +68,7 @@ test("the build has no Pages mode, and never emits a CNAME", async () => {
      inert, and an old habit or a stale script must not quietly resurrect a
      second deploy artifact. */
   await execFileAsync(process.execPath, ["scripts/build.mjs", "--pages"], { cwd: root });
-  assert.deepEqual(await filesBelow(dist), [...SITE_ASSETS].sort());
+  assert.deepEqual(await filesBelow(dist), [...SITE_ASSETS, ...GENERATED_ASSETS].sort());
   await assert.rejects(stat(new URL("CNAME", dist)), { code: "ENOENT" });
 });
 
@@ -189,4 +190,48 @@ test("the analytics beacon carries nothing but its token", () => {
   const config = html.match(BEACON)[0].match(/data-cf-beacon='([^']*)'/);
   assert.ok(config, "the beacon must declare a data-cf-beacon config");
   assert.deepEqual(JSON.parse(config[1]), { token: "4c76fa6f3023401899bbeb30fa4eebd3" });
+});
+
+/* The capability manifest the build publishes.
+ *
+ * Tempo Ladder published nothing about itself, so the shop site's guide-build
+ * audit could not check whether its guide still names the build it serves —
+ * and an app in that audit's uncovered list can carry a stale stamp for as
+ * long as it takes somebody to notice by hand. The manifest closes that, and
+ * the only way it stays worth having is if its version cannot drift from the
+ * page it describes. */
+test("the published version is read from the page, not repeated", async () => {
+  const html = await readFile(new URL("index.html", root), "utf8");
+  const stamp = buildStamp(html);
+
+  assert.match(stamp, /^\d{4}-\d{2}-\d{2}(\.\d+)?$/, "the build stamp should be an ISO date, optionally suffixed");
+  assert.equal(capabilities(stamp).version, stamp);
+
+  /* README.md carries the same identifier, and the README standard workflow
+     checks that pair. Asserting it here too means a local run catches a
+     mismatch before CI does. */
+  const readme = await readFile(new URL("README.md", root), "utf8");
+  assert.match(readme, new RegExp("\\*\\*Build:\\*\\* `" + stamp.replace(/\./g, "\\.") + "`"),
+    "README.md and index.html name different builds");
+
+  /* The page holds other ISO dates, so the whole assignment is the anchor: a
+     looser pattern would publish a number nobody chose, and a reworded block
+     must fail loudly rather than quietly yield the wrong one. */
+  assert.throws(() => buildStamp('<script>var build = "2026-09-04";</script>'), /no build-stamp block/);
+  assert.equal(buildStamp('var build = (window.__BUILD__ && String(window.__BUILD__)) || "2026-01-02.3";'), "2026-01-02.3");
+
+  const published = capabilities(stamp);
+  assert.equal(published.app, "tempo-ladder");
+  assert.match(published.launchUrl, /^https:\/\/tempoladder\./);
+  assert.match(published.guideUrl, /^https:\/\/guides\./);
+  /* No privacy block: those fields are a claim, and an unchecked one published
+     at a public URL is worse than an absent field. */
+  assert.equal(published.privacy, undefined);
+});
+
+/* And the build actually writes it, with the version the page names. */
+test("the built artifact carries capabilities.json", async () => {
+  const manifest = JSON.parse(await readFile(new URL("capabilities.json", dist), "utf8"));
+  const html = await readFile(new URL("index.html", root), "utf8");
+  assert.equal(manifest.version, buildStamp(html));
 });
