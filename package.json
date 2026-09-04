@@ -7,7 +7,7 @@
     "dev": "node scripts/dev.mjs",
     "build": "node scripts/build.mjs",
     "preview": "pnpm build && wrangler dev",
-    "lint": "node --check scripts/build.mjs && node --check scripts/dev.mjs && node --check scripts/lint.mjs && node --check scripts/validate-workflows.mjs && node --check tests/site.test.mjs && node --check js/tempoladder-app.js && node --check js/tempoladder-core.js && node --check js/tempoladder-link.js && node scripts/lint.mjs && node scripts/validate-workflows.mjs",
+    "lint": "node --check scripts/build.mjs && node --check scripts/capabilities.mjs && node --check scripts/dev.mjs && node --check scripts/lint.mjs && node --check scripts/validate-workflows.mjs && node --check tests/site.test.mjs && node --check js/tempoladder-app.js && node --check js/tempoladder-core.js && node --check js/tempoladder-link.js && node scripts/lint.mjs && node scripts/validate-workflows.mjs",
     "test": "node --test",
     "deploy": "pnpm build && wrangler deploy",
     "deploy:dry-run": "pnpm build && wrangler deploy --dry-run --outdir .wrangler/dry-run",
