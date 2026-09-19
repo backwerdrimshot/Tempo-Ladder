@@ -14,7 +14,7 @@
     "check": "pnpm lint && pnpm test && pnpm build && pnpm deploy:dry-run"
   },
   "devDependencies": {
-    "wrangler": "4.114.0",
+    "wrangler": "4.131.0",
     "yaml": "2.8.1"
   }
 }
