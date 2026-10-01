@@ -1,248 +1,62 @@
-# Tempo Ladder — by Backwerd Rhythm Shop
+# Retired — now part of Pulse Pocket Metronome
 
-**One exercise. One controlled climb. One controlled descent.**
+The standalone slow–fast–slow tempo app this repository built was **retired on
+2026-10-01**. Everything it did is now Pulse Pocket Metronome's **tempo ramp**
+(Practice Tools → Tempo ramp), from Pulse Pocket build `2026-10-01`:
 
-Tempo Ladder guides a percussionist through a single symmetric **slow → fast →
-slow** tempo sequence while the student plays a rudiment, exercise, excerpt,
-scale, or any other material *outside* the app. Tempo Ladder manages the tempo;
-you bring the music.
+| The old app | Pulse Pocket's tempo ramp |
+|---|---|
+| Starting BPM | The tempo set when the ramp starts (`bpm`) |
+| Peak BPM | Target tempo (`ramp`) |
+| BPM step | Change by (`rampstep`) |
+| Measures per tempo (4, 8, 16) | Every … bars (`rampbars`, 1–64) |
+| One climb and one descent, peak played once | At the target: **Come back, then stop** (`rampend=back`) |
+| Step mode's click-only reset measure | **Rest bar before each tempo** (`rest=on`) |
+| Nonstop mode | Rest bars off (`rest=off`) |
+| "What are you playing?" label | The setup's name (`name`) |
+| Copy link | Copy link, in the ramp's own controls |
 
-Sibling app to [Pulse Pocket Metronome](https://pulse.backwerdrhythmshop.com/),
-[Click Drop](https://clickdrop.backwerdrhythmshop.com/), and
-[Grid Board](https://gridboard.backwerdrhythmshop.com/).
+## What this repository serves now
 
-## Release information
+`tempoladder.backwerdrhythmshop.com` serves one page, [`index.html`](index.html),
+which sends every visit on to <https://pulse.backwerdrhythmshop.com/> with the same
+climb ready to start, so shared links and home-screen icons keep working:
 
-- **Build:** `2026-09-19`
-- **Status:** Live
-- **Live app:** <https://tempoladder.backwerdrhythmshop.com/>
-- **Public app guide:** <https://guides.backwerdrhythmshop.com/tempo-ladder/>
-- **Repository:** <https://github.com/backwerdrimshot/Tempo-Ladder>
+```
+/?start=60&peak=100&step=5&measures=8&mode=step&label=Line%204
+  -> https://pulse.backwerdrhythmshop.com/?name=Line%204&meter=4/4&bpm=60
+       &ramp=100&rampstep=5&rampbars=8&rampend=back&rest=on
+```
 
-Build identifiers use ISO `YYYY-MM-DD`, based on the date the shipped app update
-began, with `.2`, `.3`, and so on for later same-day releases. They identify
-user-facing app releases and are not coupled to infrastructure-only or documentation
-changes. The README and app footer must still agree.
+As the old app did, a link wins over the settings that browser last used here
+(`tempoladder-settings` in local storage), which win over the old defaults, field by
+field. The page is `noindex`, its canonical address is Pulse Pocket's, and its icons
+and manifest are Pulse Pocket's. It loads no analytics, counter, fonts or other
+scripts.
 
-## Privacy and accessibility
-
-Tempo Ladder requires no account or backend. Settings stay in the browser's local
-storage. One script does load: a Cloudflare Web Analytics beacon that counts page views
-and nothing else — no cookies, no fingerprinting, no following anyone to another site.
-It carries the same site token as the rest of backwerdrhythmshop.com so this app's
-numbers land beside the page that describes it, and it never sees a climb, a tempo or a
-remembered setting. The shop site's `/privacy/` describes it for visitors. The app supports keyboard controls, visible focus, reduced motion, phone and
-tablet layouts, classroom displays, and a best-effort screen wake lock while playing.
-
-## Local development
-
-The application remains a static HTML, JavaScript, and PWA asset bundle. Node and
-Wrangler provide a production-equivalent local server and an explicit asset build.
+## Local development and testing
 
 ```sh
 pnpm install --frozen-lockfile
-pnpm dev
+pnpm check
 ```
 
-`pnpm dev` builds the allowlisted site assets, watches them for changes, and starts
-Wrangler's local server. Use `pnpm build` for a production build in `dist/` and
-`pnpm preview` to serve a fresh production build without source watching.
-
-The original zero-tool options remain available:
-
-- Double-click `index.html` to run directly from `file://`.
-- Or serve it locally with the PowerShell helper:
-
-  ```powershell
-  powershell -ExecutionPolicy Bypass -File serve.ps1
-  ```
-
-  then open <http://localhost:8433/>.
-
-## What it does
-
-You set five things and press **Start**:
-
-| Control | Default | Notes |
-|---|---|---|
-| Starting BPM | 60 | The tempo at both ends of the ladder |
-| Peak BPM | 100 | Played exactly once, at the apex |
-| BPM step | 5 | Size of each rung |
-| Measures per tempo | 8 | 4, 8, or 16 |
-| Mode | Step | **Step** or **Nonstop** |
-
-Fixed for the MVP: **4/4**, quarter-note click, accented beat one, and a
-one-measure **count-in** at the starting tempo.
-
-### The ladder
-
-Tempo Ladder always builds one symmetric path — the start tempo bookends it, the
-peak is hit once, and the descent retraces the ascent:
-
-```
-60 → 65 → 70 → 75 → 80 → 75 → 70 → 65 → 60
-```
-
-If the step doesn't land exactly on the peak, the exact peak is still included
-and the return stays symmetric over the rungs actually visited:
-
-```
-buildLadder({ startBpm: 60, peakBpm: 72, stepBpm: 5 })  ->  [60, 65, 70, 72, 70, 65, 60]
-```
-
-### Step Mode
-
-Between played rungs, Step Mode inserts **exactly one click-only measure** — a
-short physical reset that also counts you into the new tempo. It clicks at the
-**upcoming** tempo, not the previous one:
-
-> Listen — next tempo: 65 BPM
-
-Those click-only measures (and the opening count-in) use a softer, warmer click
-than the played measures, so you *hear* "count / reset — don't play yet" without
-having to watch the screen.
-
-### Nonstop Mode
-
-You play straight through the whole ladder. There's no reset measure; the tempo
-changes on the next measure boundary, and the final measure before each change
-shows a warning:
-
-> Tempo change next measure → 65 BPM
-
-### Small conveniences
-
-- **Remembered settings** — your last-used values come back next time (stored
-  locally in the browser; nothing leaves the device).
-- **Shareable link** — **Copy link** puts a URL on your clipboard that opens the
-  setup pre-filled with the current climb, e.g.
-  `…/index.html?start=60&peak=100&step=5&measures=8&mode=step`. Hand one to a
-  student and they get exactly the ladder you set. A shared link wins over
-  remembered settings.
-- **What are you playing?** — an optional label ("Line 4", "single-stroke roll",
-  "Bach, m. 12"). It shows while the ladder runs and travels with the link as
-  `&label=…`, so a student opening your ladder knows what it is for. Tempo Ladder
-  still supplies no musical content — this is a caption for material that lives
-  outside the app, and it is the natural place to name an exercise built in
-  [Grid Board](https://gridboard.backwerdrhythmshop.com/).
-- **Stays awake** — while a session plays, the screen is kept from sleeping
-  (best-effort, where the browser supports it) so a phone on a music stand
-  doesn't dim mid-climb.
-
-## Architecture
-
-Layered exactly like Click Drop, so the musical logic is testable without a
-browser or speakers:
-
-1. **Ladder construction** — `buildLadder()` (pure)
-2. **Playback-position machine** — `createLadderPlayback()` (pure)
-3. **Web Audio scheduler** — a lookahead scheduler on the `AudioContext`
-   timeline (the single source of truth for *when* beats happen)
-4. **Timestamped visual-event queue** — keeps the display synced to what's heard
-5. **DOM rendering**
-
-Layers 1–2 live in [`js/tempoladder-core.js`](js/tempoladder-core.js) with no DOM
-or audio. Layers 3–5 live in [`js/tempoladder-app.js`](js/tempoladder-app.js).
-Tempo changes are baked into the scheduled audio timeline — never an imprecise
-UI timer flipping a BPM variable after the fact.
-
-## Testing
-
-The pure ladder and playback logic are covered by runner-agnostic cases in
-[`tests/cases.js`](tests/cases.js), and the settings/link logic by
-[`tests/link-cases.js`](tests/link-cases.js):
-
-- **In a browser:** open [`tests/test.html`](tests/test.html) — no tooling needed.
-- **With Node:** `pnpm test`
-- **Complete validation:** `pnpm check`
-
-`pnpm check` runs static lint and workflow/YAML checks, all Node tests, a production
-build, and a Wrangler deployment dry run.
-
-They verify the required behavior: the `60,65,70,65,60` example, an off-grid
-peak included exactly once, the start tempo at both ends, one Step-Mode
-transition per rung at the *upcoming* tempo, no Nonstop transitions, tempo
-changes only at measure boundaries, pause/resume position integrity, reset,
-snapshot coherence, and no timing drift over a full ladder.
-
-## What Tempo Ladder is *not*
-
-No notation, exercise library, sticking, rhythm building, counting systems,
-disappearing clicks, custom subdivisions or accents, extra meters, grading,
-scores, badges, challenges, accounts, or practice history. It manages tempo
-progression; the student or teacher supplies the musical content.
+`pnpm check` runs the lint and workflow checks, the forwarding tests in
+[`tests/site.test.mjs`](tests/site.test.mjs), a production build of `dist/`, and a
+Wrangler deployment dry run. `pnpm dev` serves the page locally.
 
 ## Deployment
 
-Cloudflare Workers Static Assets serves the production `dist/` allowlist. There is no
-Worker script, API, database, authentication, or server-side application code.
+Cloudflare Workers Static Assets serves `dist/` as the `tempo-ladder` Worker
+(`wrangler.jsonc`); `pnpm deploy` builds and deploys it, and where GitHub Actions
+still runs, a merge to `main` that passes **Validate static site** deploys it through
+`workers.yml`. Merge and deploy this only **after** Pulse Pocket build `2026-10-01`
+is live, or old links will land on a Pulse Pocket that cannot read their ramp.
 
-- `wrangler.jsonc` names the Worker `tempo-ladder`, uses compatibility date
-  `2026-07-26`, and serves `./dist` with normal 404 handling.
-- `pnpm deploy:dry-run` validates the deployment bundle without uploading it.
-- `pnpm deploy` builds and deploys the Worker.
-- The **Deploy to Cloudflare Workers** workflow performs the same validated
-  production deployment. It runs automatically once **Validate static site**
-  passes on `main`, deploying the exact commit CI checked, and can also be
-  dispatched by hand. A failed or cancelled CI run does not publish. Configure
-  its `cloudflare-workers-production` environment with `CLOUDFLARE_API_TOKEN`
-  and `CLOUDFLARE_ACCOUNT_ID` secrets.
-
-  This was manual-only until 2026-08-01, to keep unvalidated builds out of
-  production. It did not do that — it required somebody to remember, and on
-  2026-08-01 nobody did: `main` carried build `2026-08-01.4` while the origin
-  served `.3` for over an hour, with every check in this repository green,
-  because they all read this repository. Chaining the deploy to the CI run keeps
-  the guarantee without depending on memory.
-
-There is one deploy path. The GitHub Pages workflow and the committed `CNAME`
-were removed on 2026-08-01: Pages published a complete second copy of this app
-on every merge, and the `CNAME` claimed `tempoladder.backwerdrhythmshop.com` —
-the hostname the Worker Custom Domain already serves. DNS routes that name to
-Cloudflare, so the Pages copy was never reachable.
-
-It was not merely redundant. Its "Deploy to GitHub Pages" run went green on
-every merge, which is precisely what made a *missing* production deploy look
-like a successful one for over an hour. A spare deploy path that cannot serve
-traffic is not a fallback; it is a second thing that can look like it
-published. `scripts/validate-workflows.mjs` asserts it does not come back.
-
-**Which of the two the custom domain actually resolves to is a DNS and dashboard
-fact, and it is not visible from this repository.** Nothing in git records it, so
-do not infer it from the files here — two publishers both reporting success tell
-you nothing about which one a visitor reaches. To find out what is really being
-served, read the build stamp in the live footer and compare it against the
-`var build` value in `index.html` on `main`; they agree only if the live origin
-is current. That comparison is what caught the `.3`/`.4` gap above, and it is the
-only check here that reads production rather than this repository.
-
-## Support and feedback
-
-- **Report a problem** emails `support@backwerdrhythmshop.com`.
-- **Request a feature** emails `feedback@backwerdrhythmshop.com`.
-- Both controls are available in the app footer and prefill the app name, build,
-  page URL, and browser details to make follow-up easier.
-
-## Visit counter
-
-The footer shows a running visit count next to the build stamp. It comes from our own
-Cloudflare Worker at `counter.backwerdrhythmshop.com`, which stores exactly one thing:
-an integer per app. No IP, no user agent, no cookie, no timestamp — nothing tied to a
-visitor. Counted once per browser session; localhost and file:// only read the number
-so development never inflates it.
-
-It is progressive enhancement. If the endpoint is offline, blocked, or not yet
-deployed, the footer renders exactly as it did before and the app is unaffected.
-
-## Follow
-
-Backwerd Rhythm Shop posts practice ideas, new app releases, and classroom tips:
-
-- Facebook — <https://www.facebook.com/backwerdrhythmshop/>
-- Instagram — <https://www.instagram.com/backwerdrhythmshop/>
-- YouTube — <https://www.youtube.com/@backwerdrhythmshop>
-
-These three links also appear as icon buttons in the app footer.
+Once old links have stopped arriving (the Worker's request count in the Cloudflare
+dashboard shows it), the Worker and its custom domain can be deleted in the
+Cloudflare dashboard and this repository archived on GitHub. Neither step can be
+taken from this repository.
 
 ## Ownership
 

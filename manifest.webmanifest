@@ -1,7 +1,7 @@
 {
-  "name": "Tempo Ladder",
-  "short_name": "Tempo Ladder",
-  "description": "A controlled slow-fast-slow tempo trainer.",
+  "name": "Pulse Pocket Metronome",
+  "short_name": "Pulse Pocket",
+  "description": "This app has moved into Pulse Pocket Metronome's tempo ramp.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
