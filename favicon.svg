@@ -1,19 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
-  <title id="title">Tempo Ladder</title>
-  <desc id="desc">A ladder with three rungs, the top one in the accent</desc>
-  <!-- Timing family: Ink ground. An actual ladder rather than rising bars.
-       Rising bars were doing two jobs badly: they read as a generic signal-
-       strength meter, and at 56px they were the icon most easily confused with
-       Scale Trail, which is in a different family and also means "ascending".
-       A ladder is the app's own name and collides with nothing. -->
+  <title id="title">Pulse Pocket</title>
+  <desc id="desc">One ring with a single accent nub on it</desc>
+  <!-- Timing family: Ink ground. One ring, not four — the outer three of the
+       shipped icon merge into a single blur below about 64px. The Terra nub is
+       the shared shop accent, the same solid dot that sits on the arm of the
+       rimshot mark in the favicon. -->
   <rect width="1024" height="1024" fill="#171717"/>
-  <g fill="#fafaf9">
-    <rect x="296" y="250" width="72" height="524" rx="36"/>
-    <rect x="656" y="250" width="72" height="524" rx="36"/>
-    <rect x="296" y="638" width="432" height="72" rx="36"/>
-    <rect x="296" y="476" width="432" height="72" rx="36"/>
-  </g>
-  <!-- The rung being worked toward. -->
-  <rect x="296" y="314" width="432" height="72" rx="36" fill="#e2725b"/>
+  <circle cx="512" cy="512" r="280" fill="none" stroke="#fafaf9" stroke-width="84"/>
+  <circle cx="512" cy="232" r="76" fill="#e2725b"/>
 </svg>
